@@ -1,11 +1,25 @@
 import { Request, Response } from 'express';
 import ServiceRequest from '../models/ServiceRequest';
+import { runAgenticWorkflow } from '../agent/orchestrator';
 
 export const createServiceRequest = async (req: Request, res: Response) => {
   try {
-    const serviceRequest = new ServiceRequest(req.body);
+    // 1. Create Initial Request
+    const serviceRequest = new ServiceRequest({
+      userId: req.body.userId,
+      rawText: req.body.rawText,
+      status: 'pending'
+    });
     await serviceRequest.save();
-    res.status(201).json(serviceRequest);
+
+    // 2. Trigger the Antigravity Agent Orchestrator
+    const agentResult = await runAgenticWorkflow(
+      serviceRequest._id.toString(), 
+      req.body.rawText,
+      req.body.userId
+    );
+
+    res.status(201).json({ serviceRequest, agentResult });
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
   }
