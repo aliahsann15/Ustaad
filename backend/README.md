@@ -1,6 +1,6 @@
-# Fixit Backend - AI Service Orchestrator
+# Ustaad Backend - AI Service Orchestrator
 
-This is the backend for the **Fixit** platform, an AI-powered service orchestration system designed to automate the end-to-end service lifecycle for the informal economy (plumbers, electricians, tutors, etc.).
+This is the backend for the **Ustaad** platform, an AI-powered service orchestration system designed to automate the end-to-end service lifecycle for the informal economy (plumbers, electricians, tutors, etc.).
 
 ## 🚀 Features
 

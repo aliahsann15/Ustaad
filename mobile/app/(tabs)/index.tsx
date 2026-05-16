@@ -1,98 +1,149 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { View, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { theme } from '../../constants/theme';
+import { Typography } from '../../components/Typography';
+import { Card } from '../../components/Card';
+import { useBookingStore } from '../../store/useBookingStore';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const [requestText, setRequestText] = useState('');
+  const setRequest = useBookingStore(state => state.setRequest);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const handleSubmit = () => {
+    if (requestText.trim().length === 0) return;
+    setRequest(requestText);
+    router.push('/matching');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.content}>
+        
+        {/* Header */}
+        <View style={styles.header}>
+          <Typography variant="h2" color={theme.colors.textPrimary}>Good Morning!</Typography>
+          <Typography variant="body" color={theme.colors.textSecondary}>Need something fixed?</Typography>
+        </View>
+
+        {/* Hero Section / Input */}
+        <View style={styles.heroSection}>
+          <Typography variant="h1" color={theme.colors.textPrimary} style={styles.heroText}>
+            What do you need fixed today?
+          </Typography>
+          
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="e.g. My AC is leaking water in G-13"
+              placeholderTextColor={theme.colors.textSecondary}
+              value={requestText}
+              onChangeText={setRequestText}
+              multiline
+            />
+            <TouchableOpacity 
+              style={[styles.fab, requestText.length > 0 ? styles.fabActive : null]}
+              onPress={handleSubmit}
+            >
+              <Ionicons 
+                name={requestText.length > 0 ? "arrow-forward" : "mic"} 
+                size={24} 
+                color="#FFF" 
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Quick Suggestions */}
+        <Typography variant="h3" style={{ marginBottom: theme.spacing.md }}>Suggested Services</Typography>
+        <View style={styles.suggestions}>
+          <Card style={styles.suggestionCard}>
+            <Ionicons name="water" size={32} color={theme.colors.primary} />
+            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Plumber</Typography>
+          </Card>
+          <Card style={styles.suggestionCard}>
+            <Ionicons name="flash" size={32} color={theme.colors.primary} />
+            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Electrician</Typography>
+          </Card>
+          <Card style={styles.suggestionCard}>
+            <Ionicons name="snow" size={32} color={theme.colors.primary} />
+            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>AC Repair</Typography>
+          </Card>
+        </View>
+
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  content: {
+    flex: 1,
+    padding: theme.spacing.xl,
+  },
+  header: {
+    marginBottom: theme.spacing.xxl,
+  },
+  heroSection: {
+    marginBottom: theme.spacing.xxl,
+  },
+  heroText: {
+    marginBottom: theme.spacing.xl,
+  },
+  inputContainer: {
     flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: theme.colors.card,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    shadowColor: theme.colors.textPrimary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  input: {
+    flex: 1,
+    minHeight: 60,
+    fontSize: theme.typography.sizes.lg,
+    fontFamily: theme.typography.fontFamilies.regular,
+    color: theme.colors.textPrimary,
+    paddingRight: theme.spacing.md,
+  },
+  fab: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: theme.colors.navBackground, // Default to deep slate
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    shadowColor: theme.colors.navBackground,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  fabActive: {
+    backgroundColor: theme.colors.primary, // Switch to Amber when active
+    shadowColor: theme.colors.primary,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  suggestions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
+  suggestionCard: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: theme.spacing.xs,
+    padding: theme.spacing.md,
+  }
 });
