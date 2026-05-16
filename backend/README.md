@@ -58,7 +58,7 @@ Create a `.env` file in the `backend` root (you can copy from `.env.example`) an
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/fixit
+MONGODB_URI=mongodb://localhost:27017/ustaad
 
 # AI Orchestrator
 GEMINI_API_KEY=your_gemini_api_key_here
