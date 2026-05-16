@@ -19,6 +19,11 @@ export default function HomeScreen() {
     router.push('/matching');
   };
 
+  const handleQuickSelect = (service: string) => {
+    setRequest(service);
+    router.push('/matching');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.content}>
@@ -60,18 +65,35 @@ export default function HomeScreen() {
         {/* Quick Suggestions */}
         <Typography variant="h3" style={{ marginBottom: theme.spacing.md }}>Suggested Services</Typography>
         <View style={styles.suggestions}>
-          <Card style={styles.suggestionCard}>
-            <Ionicons name="water" size={32} color={theme.colors.primary} />
-            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Plumber</Typography>
-          </Card>
-          <Card style={styles.suggestionCard}>
-            <Ionicons name="flash" size={32} color={theme.colors.primary} />
-            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Electrician</Typography>
-          </Card>
-          <Card style={styles.suggestionCard}>
-            <Ionicons name="snow" size={32} color={theme.colors.primary} />
-            <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>AC Repair</Typography>
-          </Card>
+          <TouchableOpacity 
+            style={styles.suggestionButton}
+            onPress={() => handleQuickSelect('I need a Plumber')}
+          >
+            <Card style={styles.suggestionCard}>
+              <Ionicons name="water" size={32} color={theme.colors.primary} />
+              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Plumber</Typography>
+            </Card>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.suggestionButton}
+            onPress={() => handleQuickSelect('I need an Electrician')}
+          >
+            <Card style={styles.suggestionCard}>
+              <Ionicons name="flash" size={32} color={theme.colors.primary} />
+              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Electrician</Typography>
+            </Card>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.suggestionButton}
+            onPress={() => handleQuickSelect('My AC needs repair')}
+          >
+            <Card style={styles.suggestionCard}>
+              <Ionicons name="snow" size={32} color={theme.colors.primary} />
+              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>AC Repair</Typography>
+            </Card>
+          </TouchableOpacity>
         </View>
 
       </KeyboardAvoidingView>
@@ -140,10 +162,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  suggestionCard: {
+  suggestionButton: {
     flex: 1,
-    alignItems: 'center',
     marginHorizontal: theme.spacing.xs,
+  },
+  suggestionCard: {
+    alignItems: 'center',
     padding: theme.spacing.md,
   }
 });
