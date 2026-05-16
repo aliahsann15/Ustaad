@@ -208,7 +208,7 @@ I have successfully created the `.env` and `.env.example` files in your `backend
 
 The `.env` file is pre-configured with:
 - `PORT=5000`
-- `MONGODB_URI=mongodb://localhost:27017/fixit`
+- `MONGODB_URI=mongodb://localhost:27017/ustaad`
 - Placeholder keys for the `GEMINI_API_KEY` (which we will use for the Antigravity Agent Orchestrator in Phase 2) and `GOOGLE_MAPS_API_KEY`.
 
 Since you are currently running `npm run dev` in your terminal, the `dotenv` package in `src/index.ts` will automatically load these variables the next time the server restarts (which happens on every file save thanks to `nodemon`).
