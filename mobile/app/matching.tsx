@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, {
   useSharedValue,
@@ -12,6 +11,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
+import { Header } from '../components/Header';
 
 export default function MatchingScreen() {
   const router = useRouter();
@@ -48,7 +48,8 @@ export default function MatchingScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header title="Matching Ustaad" isSubScreen={true} />
       {/* Visual Radar Area */}
       <View style={styles.radarSection}>
         <View style={styles.radarCenter}>
@@ -61,7 +62,7 @@ export default function MatchingScreen() {
           Antigravity Agent is working...
         </Typography>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

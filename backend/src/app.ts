@@ -6,6 +6,7 @@ import userRoutes from './routes/userRoutes';
 import providerRoutes from './routes/providerRoutes';
 import serviceRequestRoutes from './routes/serviceRequestRoutes';
 import bookingRoutes from './routes/bookingRoutes';
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/providers', providerRoutes);
 app.use('/api/service-requests', serviceRequestRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/auth', authRoutes);
 
 export default app;

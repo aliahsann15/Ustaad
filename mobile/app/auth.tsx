@@ -1,85 +1,99 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { Button } from '../components/Button';
 import { useAuthStore } from '../store/useAuthStore';
+import { Header } from '../components/Header';
 
 export default function AuthScreen() {
   const router = useRouter();
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('92');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [loading, setLoading] = useState(false);
 
-  const handleSendOtp = () => {
-    if (phoneNumber.length < 10) return;
-    setLoading(true);
-    // Simulate Firebase OTP send
-    setTimeout(() => {
-      setLoading(false);
-      setStep('OTP');
-    }, 1500);
+  const formatDisplay = (num: string) => {
+    // Structure: +92 3XX XXXXXXX
+    if (num.length <= 2) return '+' + num;
+    if (num.length <= 5) return `+${num.slice(0, 2)} ${num.slice(2)}`;
+    return `+${num.slice(0, 2)} ${num.slice(2, 5)} ${num.slice(5, 12)}`;
   };
 
-  const handleVerifyOtp = () => {
-    if (otp.length < 6) return;
+  const handlePhoneChange = (text: string) => {
+    // Only allow digits
+    const cleaned = text.replace(/[^0-9]/g, '');
+    
+    // Ensure 92 is always at the start
+    let final = cleaned;
+    if (!cleaned.startsWith('92')) {
+      if (cleaned.length < 2) final = '92';
+      else final = '92' + cleaned;
+    }
+    
+    // Limit to 12 digits (+92 + 10 digits)
+    setPhoneNumber(final.slice(0, 12));
+  };
+
+  const isPhoneValid = phoneNumber.length === 12 && phoneNumber.startsWith('923');
+
+  const handleLogin = async () => {
+    if (!isPhoneValid) return;
     setLoading(true);
-    // Simulate verification
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login-mock`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setAuthenticated(true, phoneNumber, data.token, data.user._id);
+        router.replace('/(tabs)');
+      } else {
+        alert(data.error || 'Login failed');
+      }
+    } catch (error) {
+      alert('Network error. Make sure your backend is running.');
+    } finally {
       setLoading(false);
-      setAuthenticated(true, phoneNumber, 'mock_token_123');
-      router.replace('/(tabs)');
-    }, 1500);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header title="Welcome" />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.content}
       >
         <View style={styles.header}>
-          <Typography variant="h1" color={theme.colors.textPrimary}>
-            {step === 'PHONE' ? 'Welcome to Ustaad' : 'Verify Phone'}
-          </Typography>
-          <Typography variant="body" color={theme.colors.textSecondary} style={{ marginTop: theme.spacing.sm }}>
-            {step === 'PHONE' 
-              ? 'Enter your mobile number to get started.' 
-              : `Enter the 6-digit code sent to ${phoneNumber}`}
+          <Typography variant="body" color={theme.colors.textSecondary}>
+            Enter your mobile number to get started with Ustaad.
           </Typography>
         </View>
 
         <View style={styles.form}>
-          {step === 'PHONE' ? (
-            <TextInput
-              style={styles.input}
-              placeholder="+92 3XX XXXXXXX"
-              keyboardType="phone-pad"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              autoFocus
-            />
-          ) : (
-            <TextInput
-              style={styles.input}
-              placeholder="123456"
-              keyboardType="number-pad"
-              maxLength={6}
-              value={otp}
-              onChangeText={setOtp}
-              autoFocus
-            />
-          )}
+          <TextInput
+            style={styles.input}
+            placeholder="+92 3XX XXXXXXX"
+            keyboardType="phone-pad"
+            value={formatDisplay(phoneNumber)}
+            onChangeText={handlePhoneChange}
+            autoFocus
+            maxLength={15} // +92 + 2 spaces + 10 digits
+          />
 
           <Button
-            title={step === 'PHONE' ? 'Send OTP' : 'Verify & Continue'}
-            onPress={step === 'PHONE' ? handleSendOtp : handleVerifyOtp}
+            title="Join Ustaad"
+            onPress={handleLogin}
             loading={loading}
-            disabled={step === 'PHONE' ? phoneNumber.length < 10 : otp.length < 6}
+            disabled={!isPhoneValid}
             style={{ marginTop: theme.spacing.xl }}
           />
         </View>
@@ -97,7 +111,7 @@ export default function AuthScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 

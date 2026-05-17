@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Card } from '../../components/Card';
 import { useBookingStore } from '../../store/useBookingStore';
+import { Header } from '../../components/Header';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -25,79 +25,72 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.content}>
-        
-        {/* Header */}
-        <View style={styles.header}>
-          <Typography variant="h2" color={theme.colors.textPrimary}>Good Morning!</Typography>
-          <Typography variant="body" color={theme.colors.textSecondary}>Need something fixed?</Typography>
-        </View>
-
-        {/* Hero Section / Input */}
-        <View style={styles.heroSection}>
-          <Typography variant="h1" color={theme.colors.textPrimary} style={styles.heroText}>
-            What do you need fixed today?
-          </Typography>
-          
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="e.g. My AC is leaking water in G-13"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={requestText}
-              onChangeText={setRequestText}
-              multiline
-            />
-            <TouchableOpacity 
-              style={[styles.fab, requestText.length > 0 ? styles.fabActive : null]}
-              onPress={handleSubmit}
-            >
-              <Ionicons 
-                name={requestText.length > 0 ? "arrow-forward" : "mic"} 
-                size={24} 
-                color="#FFF" 
-              />
-            </TouchableOpacity>
+    <View style={styles.container}>
+      <Header title="Welcome!" />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={styles.content}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+        >
+          {/* Hero Section / Vertically Centered Title */}
+          <View style={styles.topArea}>
+            <Typography variant="h1" color={theme.colors.textPrimary} style={styles.heroText}>
+              What do you need fixed today?
+            </Typography>
           </View>
-        </View>
 
-        {/* Quick Suggestions */}
-        <Typography variant="h3" style={{ marginBottom: theme.spacing.md }}>Suggested Services</Typography>
-        <View style={styles.suggestions}>
-          <TouchableOpacity 
-            style={styles.suggestionButton}
-            onPress={() => handleQuickSelect('I need a Plumber')}
-          >
-            <Card style={styles.suggestionCard}>
-              <Ionicons name="water" size={32} color={theme.colors.primary} />
-              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Plumber</Typography>
-            </Card>
-          </TouchableOpacity>
+          {/* Bottom Area: Input Row (Input + Outside Mic) & Suggestions */}
+          <View style={styles.bottomArea}>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder="My AC is not working in G-13"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={requestText}
+                onChangeText={setRequestText}
+                multiline
+              />
+              <TouchableOpacity 
+                style={[styles.fab, requestText.length > 0 ? styles.fabActive : null]}
+                onPress={handleSubmit}
+              >
+                <Ionicons 
+                  name={requestText.length > 0 ? "arrow-forward" : "mic"} 
+                  size={24} 
+                  color="#FFF" 
+                />
+              </TouchableOpacity>
+            </View>
 
-          <TouchableOpacity 
-            style={styles.suggestionButton}
-            onPress={() => handleQuickSelect('I need an Electrician')}
-          >
-            <Card style={styles.suggestionCard}>
-              <Ionicons name="flash" size={32} color={theme.colors.primary} />
-              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>Electrician</Typography>
-            </Card>
-          </TouchableOpacity>
+            {/* Quick Suggestions as Pills under Input Field */}
+            <View style={styles.suggestions}>
+              <TouchableOpacity 
+                style={styles.suggestionPill}
+                onPress={() => handleQuickSelect('I need a Plumber')}
+              >
+                <Typography variant="caption" weight="medium" style={styles.pillText}>Plumber</Typography>
+              </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.suggestionButton}
-            onPress={() => handleQuickSelect('My AC needs repair')}
-          >
-            <Card style={styles.suggestionCard}>
-              <Ionicons name="snow" size={32} color={theme.colors.primary} />
-              <Typography variant="caption" style={{ marginTop: theme.spacing.sm }}>AC Repair</Typography>
-            </Card>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity 
+                style={styles.suggestionPill}
+                onPress={() => handleQuickSelect('I need an Electrician')}
+              >
+                <Typography variant="caption" weight="medium" style={styles.pillText}>Electrician</Typography>
+              </TouchableOpacity>
 
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+              <TouchableOpacity 
+                style={styles.suggestionPill}
+                onPress={() => handleQuickSelect('My AC needs repair')}
+              >
+                <Typography variant="caption" weight="medium" style={styles.pillText}>AC Repair</Typography>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </View>
   );
 }
 
@@ -108,46 +101,59 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: theme.spacing.xl,
+    paddingHorizontal: 16, // Exactly matches the header's marginHorizontal
+    paddingTop: theme.spacing.xl,
+    paddingBottom: 92, // Reduces spacing under the pills, leaving room for the tab bar
+    justifyContent: 'space-between',
   },
-  header: {
-    marginBottom: theme.spacing.xxl,
-  },
-  heroSection: {
-    marginBottom: theme.spacing.xxl,
+  topArea: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heroText: {
-    marginBottom: theme.spacing.xl,
+    fontSize: 28,
+    textAlign: 'center',
+    fontFamily: theme.typography.fontFamilies.bold,
+    lineHeight: 36,
   },
-  inputContainer: {
+  bottomArea: {
+    width: '100%',
+    marginBottom: 0,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    shadowColor: theme.colors.textPrimary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    width: '100%',
   },
   input: {
     flex: 1,
-    minHeight: 60,
+    backgroundColor: theme.colors.card,
+    borderRadius: 24,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: Platform.OS === 'ios' ? 12 : 8,
+    paddingBottom: Platform.OS === 'ios' ? 12 : 8,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    shadowColor: '#00000079',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 2,
     fontSize: theme.typography.sizes.lg,
     fontFamily: theme.typography.fontFamilies.regular,
     color: theme.colors.textPrimary,
-    paddingRight: theme.spacing.md,
+    minHeight: 44, // Default single-line height
+    maxHeight: 120, // Clamps beautifully at exactly 5 lines of text
   },
   fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: theme.colors.navBackground, // Default to deep slate
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: theme.colors.navBackground, // Charcoal
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: 12, // Gap between input and outer action button
     shadowColor: theme.colors.navBackground,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -160,14 +166,20 @@ const styles = StyleSheet.create({
   },
   suggestions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    marginTop: 10,
   },
-  suggestionButton: {
-    flex: 1,
-    marginHorizontal: theme.spacing.xs,
+  suggestionPill: {
+    borderRadius: 10,
+    paddingHorizontal: 22,
+    paddingVertical: 6,
+    marginHorizontal: 6,
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
   },
-  suggestionCard: {
-    alignItems: 'center',
-    padding: theme.spacing.md,
+  pillText: {
+    color: theme.colors.textPrimary,
+    fontSize: 13,
   }
 });

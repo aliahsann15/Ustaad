@@ -8,6 +8,7 @@ import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Header } from '../components/Header';
 
 export default function TrackingScreen() {
   const router = useRouter();
@@ -27,6 +28,8 @@ export default function TrackingScreen() {
 
   return (
     <View style={styles.container}>
+      <Header title="Live Tracking" isSubScreen={true} />
+      
       {/* Map View */}
       <MapView 
         provider={PROVIDER_DEFAULT}
@@ -38,16 +41,16 @@ export default function TrackingScreen() {
            <View style={styles.providerMarker}>
              <Ionicons name="car" size={20} color="#FFF" />
            </View>
-        </Marker>
+         </Marker>
       </MapView>
 
-      {/* Floating Header */}
-      <SafeAreaView style={styles.headerSafe}>
+      {/* Floating Header info */}
+      <View style={styles.headerSafe}>
         <View style={styles.headerPill}>
           <View style={styles.pulsingDot} />
           <Typography variant="body" weight="bold" color={theme.colors.textPrimary}>Provider En-Route</Typography>
         </View>
-      </SafeAreaView>
+      </View>
 
       {/* Bottom Information Card */}
       <View style={styles.bottomSheet}>
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
   },
   headerSafe: {
     position: 'absolute',
-    top: Platform.OS === 'android' ? 40 : 0,
+    top: 135,
     width: '100%',
     alignItems: 'center',
     zIndex: 10,

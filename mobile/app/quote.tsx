@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Header } from '../components/Header';
 
 export default function QuoteScreen() {
   const router = useRouter();
@@ -20,14 +20,12 @@ export default function QuoteScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header title="Match Found" isSubScreen={true} />
       <ScrollView contentContainerStyle={styles.content}>
         
         <View style={styles.header}>
           <Ionicons name="checkmark-circle" size={60} color={theme.colors.success} />
-          <Typography variant="h1" color={theme.colors.textPrimary} style={{ marginTop: theme.spacing.md, textAlign: 'center' }}>
-            Match Found!
-          </Typography>
         </View>
 
         <Card style={styles.providerCard}>
@@ -89,7 +87,7 @@ export default function QuoteScreen() {
         </View>
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

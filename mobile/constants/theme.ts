@@ -5,10 +5,10 @@ export const theme = {
     card: '#FFFFFF',
     
     // 30% Secondary (Trust, stability, text)
-    textPrimary: '#0F172A',
+    textPrimary: '#1C1C1E',
     textSecondary: '#475569',
     border: '#E2E8F0',
-    navBackground: '#1E293B',
+    navBackground: '#1C1C1E',
     
     // 10% Accent (Energy, action, urgency)
     primary: '#F59E0B',
