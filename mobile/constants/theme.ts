@@ -48,3 +48,22 @@ export const theme = {
     }
   }
 };
+
+export const Colors = {
+  light: {
+    text: '#1C1C1E',
+    background: '#F8FAFC',
+    tint: '#F59E0B',
+    icon: '#475569',
+    tabIconDefault: '#475569',
+    tabIconSelected: '#F59E0B',
+  },
+  dark: {
+    text: '#1C1C1E',
+    background: '#F8FAFC',
+    tint: '#F59E0B',
+    icon: '#475569',
+    tabIconDefault: '#475569',
+    tabIconSelected: '#F59E0B',
+  },
+};

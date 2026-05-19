@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.navBackground,
     borderRadius: 16,
     marginHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 6,
     paddingHorizontal: 16,
     elevation: 8,
     shadowColor: '#000',

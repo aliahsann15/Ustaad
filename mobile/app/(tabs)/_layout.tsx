@@ -126,7 +126,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   tabContainerFocused: {
-    paddingLeft: 30,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderRadius: 20,
+    paddingHorizontal: 16,
   },
   tabLabel: {
     fontFamily: theme.typography.fontFamilies.bold,

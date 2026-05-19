@@ -28,62 +28,67 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Header title="Welcome!" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.content}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
         >
-          {/* Hero Section / Vertically Centered Title */}
+          {/* Hero Section / Vertically Centered Title & Suggestions */}
           <View style={styles.topArea}>
             <Typography variant="h1" color={theme.colors.textPrimary} style={styles.heroText}>
-              What do you need fixed today?
+              Assalam-o-Alaikum!
             </Typography>
-          </View>
+            <Typography variant="body" style={styles.brandSubtext}>
+              What's bothering you today? Let's get it fixed!
+            </Typography>
 
-          {/* Bottom Area: Input Row (Input + Outside Mic) & Suggestions */}
-          <View style={styles.bottomArea}>
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                placeholder="My AC is not working in G-13"
-                placeholderTextColor={theme.colors.textSecondary}
-                value={requestText}
-                onChangeText={setRequestText}
-                multiline
-              />
-              <TouchableOpacity 
-                style={[styles.fab, requestText.length > 0 ? styles.fabActive : null]}
-                onPress={handleSubmit}
-              >
-                <Ionicons 
-                  name={requestText.length > 0 ? "arrow-forward" : "mic"} 
-                  size={24} 
-                  color="#FFF" 
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Quick Suggestions as Pills under Input Field */}
+            {/* Quick Suggestions as Pills under the Center Content */}
             <View style={styles.suggestions}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.suggestionPill}
                 onPress={() => handleQuickSelect('I need a Plumber')}
               >
                 <Typography variant="caption" weight="medium" style={styles.pillText}>Plumber</Typography>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.suggestionPill}
                 onPress={() => handleQuickSelect('I need an Electrician')}
               >
                 <Typography variant="caption" weight="medium" style={styles.pillText}>Electrician</Typography>
               </TouchableOpacity>
 
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.suggestionPill}
                 onPress={() => handleQuickSelect('My AC needs repair')}
               >
                 <Typography variant="caption" weight="medium" style={styles.pillText}>AC Repair</Typography>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Bottom Area: Input Row (Input + Outside Mic) */}
+          <View style={styles.bottomArea}>
+            <View style={styles.inputRow}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="My AC is not working in G-13"
+                  placeholderTextColor={theme.colors.textSecondary}
+                  value={requestText}
+                  onChangeText={setRequestText}
+                  multiline
+                />
+              </View>
+              <TouchableOpacity
+                style={[styles.fab, requestText.length > 0 ? styles.fabActive : null]}
+                onPress={handleSubmit}
+              >
+                <Ionicons
+                  name={requestText.length > 0 ? "arrow-forward" : "mic"}
+                  size={24}
+                  color="#FFF"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -103,7 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16, // Exactly matches the header's marginHorizontal
     paddingTop: theme.spacing.xl,
-    paddingBottom: 92, // Reduces spacing under the pills, leaving room for the tab bar
+    paddingBottom: 101, // 85px (Tab bar height) + 16px (matches side gutters) = 101px
     justifyContent: 'space-between',
   },
   topArea: {
@@ -117,6 +122,13 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamilies.bold,
     lineHeight: 36,
   },
+  brandSubtext: {
+    color: '#64748B',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 20,
+  },
   bottomArea: {
     width: '100%',
     marginBottom: 0,
@@ -126,13 +138,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     width: '100%',
   },
-  input: {
+  inputContainer: {
     flex: 1,
     backgroundColor: theme.colors.card,
     borderRadius: 24,
+    paddingVertical: 4,
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: Platform.OS === 'ios' ? 12 : 8,
-    paddingBottom: Platform.OS === 'ios' ? 12 : 8,
     borderWidth: 1,
     borderColor: theme.colors.border,
     shadowColor: '#00000079',
@@ -140,11 +151,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 4,
     elevation: 2,
+  },
+  input: {
+    flex: 1,
+    maxHeight: 120, // Max height for 5 lines of text
     fontSize: theme.typography.sizes.lg,
     fontFamily: theme.typography.fontFamilies.regular,
     color: theme.colors.textPrimary,
-    minHeight: 44, // Default single-line height
-    maxHeight: 120, // Clamps beautifully at exactly 5 lines of text
+    paddingTop: Platform.OS === 'ios' ? 8 : 4,
+    paddingBottom: Platform.OS === 'ios' ? 8 : 4,
   },
   fab: {
     width: 50,
@@ -153,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.navBackground, // Charcoal
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 12, // Gap between input and outer action button
+    marginLeft: 4, // Snug gap between input and outer action button
     shadowColor: theme.colors.navBackground,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

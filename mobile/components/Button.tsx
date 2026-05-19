@@ -8,6 +8,7 @@ interface ButtonProps extends TouchableOpacityProps {
   variant?: 'primary' | 'secondary' | 'outline';
   loading?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  textColor?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -15,6 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   loading = false,
   size = 'md',
+  textColor,
   style,
   disabled,
   ...props
@@ -35,7 +37,7 @@ export const Button: React.FC<ButtonProps> = ({
   const getTextColor = (): string => {
     switch (variant) {
       case 'primary':
-        return '#FFFFFF';
+        return '#1C1C1E'; // Charcoal text for high contrast on Amber background
       case 'secondary':
         return '#FFFFFF';
       case 'outline':
@@ -70,9 +72,9 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={getTextColor()} />
+        <ActivityIndicator color={textColor || getTextColor()} />
       ) : (
-        <Typography weight="bold" color={getTextColor()} style={{ textAlign: 'center' }}>
+        <Typography weight="bold" color={textColor || getTextColor()} style={{ textAlign: 'center' }}>
           {title}
         </Typography>
       )}
