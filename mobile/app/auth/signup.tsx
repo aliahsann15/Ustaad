@@ -15,6 +15,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
+import { Header } from '../../components/Header';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function SignupScreen() {
@@ -65,23 +66,14 @@ export default function SignupScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Floating Premium TopAppBar Header */}
-      <View style={[styles.floatingHeader, { top: insets.top + 8 }]}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <MaterialIcons name="chevron-left" size={28} color="#FFFFFF" />
-        </TouchableOpacity>
-        <Typography variant="h3" color="#FFFFFF" style={styles.headerTitle}>
-          Create Account
-        </Typography>
-        <View style={styles.headerSpacer} />
-      </View>
+      <Header title="Create Account" isSubScreen={true} onBackPress={handleBack} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 84, paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

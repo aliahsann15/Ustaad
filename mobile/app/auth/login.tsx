@@ -16,6 +16,7 @@ import { Image } from 'expo-image';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
+import { Header } from '../../components/Header';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function LoginScreen() {
@@ -70,27 +71,14 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Floating Premium TopAppBar Header */}
-      <View style={[styles.floatingHeader, { top: insets.top + 8 }]}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <MaterialIcons name="chevron-left" size={28} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Typography variant="h3" color="#FFFFFF" style={styles.headerTitle}>
-            Login
-          </Typography>
-        </View>
-        <Typography variant="h2" color="#FFFFFF" style={styles.brandText}>
-          Ustaad
-        </Typography>
-      </View>
+      <Header title="Login" isSubScreen={true} onBackPress={handleBack} />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 84, paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 24 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -257,10 +245,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+    flex: 1,
   },
-  brandText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  headerSpacer: {
+    width: 36, // Balance back button to center title
   },
   scrollContent: {
     paddingHorizontal: 24,
