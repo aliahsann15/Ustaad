@@ -12,11 +12,11 @@ export default function AuthGatewayScreen() {
   const insets = useSafeAreaInsets();
 
   const handleSignIn = () => {
-    router.push('/auth');
+    router.push('/auth/login');
   };
 
   const handleCreateAccount = () => {
-    router.push('/auth');
+    router.push('/auth/signup');
   };
 
   const handleContinueAsGuest = () => {
@@ -68,6 +68,7 @@ export default function AuthGatewayScreen() {
             variant="primary"
             onPress={handleSignIn}
             style={styles.pillButton}
+            icon="LogIn"
           />
           <Button
             title="Create Account"
@@ -75,6 +76,7 @@ export default function AuthGatewayScreen() {
             textColor={theme.colors.textPrimary}
             onPress={handleCreateAccount}
             style={[styles.pillButton, styles.outlineButton]}
+            icon="UserPlus"
           />
         </View>
 

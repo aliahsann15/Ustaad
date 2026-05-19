@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, ActivityIndicator, StyleSheet, TouchableOpacityProps, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, ActivityIndicator, StyleSheet, TouchableOpacityProps, ViewStyle } from 'react-native';
+import * as Lucide from 'lucide-react-native';
 import { theme } from '../constants/theme';
 import { Typography } from './Typography';
 
@@ -9,6 +10,8 @@ interface ButtonProps extends TouchableOpacityProps {
   loading?: boolean;
   size?: 'sm' | 'md' | 'lg';
   textColor?: string;
+  icon?: keyof typeof Lucide;
+  iconPosition?: 'left' | 'right';
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -19,6 +22,8 @@ export const Button: React.FC<ButtonProps> = ({
   textColor,
   style,
   disabled,
+  icon,
+  iconPosition = 'right',
   ...props
 }) => {
   const getContainerStyle = (): ViewStyle => {
@@ -59,6 +64,9 @@ export const Button: React.FC<ButtonProps> = ({
     }
   };
 
+  const IconComponent = icon ? (Lucide[icon] as React.ComponentType<any>) : null;
+  const buttonColor = textColor || getTextColor();
+
   return (
     <TouchableOpacity
       style={[
@@ -72,11 +80,19 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading ? (
-        <ActivityIndicator color={textColor || getTextColor()} />
+        <ActivityIndicator color={buttonColor} />
       ) : (
-        <Typography weight="bold" color={textColor || getTextColor()} style={{ textAlign: 'center' }}>
-          {title}
-        </Typography>
+        <>
+          {IconComponent && iconPosition === 'left' && (
+            <IconComponent size={20} color={buttonColor} style={styles.leftIcon} />
+          )}
+          <Typography weight="bold" color={buttonColor} style={{ textAlign: 'center' }}>
+            {title}
+          </Typography>
+          {IconComponent && iconPosition === 'right' && (
+            <IconComponent size={20} color={buttonColor} style={styles.rightIcon} />
+          )}
+        </>
       )}
     </TouchableOpacity>
   );
@@ -107,5 +123,11 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.6,
+  },
+  leftIcon: {
+    marginRight: 8,
+  },
+  rightIcon: {
+    marginLeft: 8,
   },
 });

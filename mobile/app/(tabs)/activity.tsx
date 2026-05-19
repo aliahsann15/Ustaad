@@ -12,7 +12,7 @@ export default function ActivityScreen() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const handleLoginPress = () => {
-    router.push('/auth');
+    router.push('/auth/login');
   };
 
   return (
@@ -48,6 +48,7 @@ export default function ActivityScreen() {
               variant="primary"
               onPress={handleLoginPress}
               style={styles.loginButton}
+              icon="LogIn"
             />
           </View>
         )}

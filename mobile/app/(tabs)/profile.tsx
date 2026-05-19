@@ -16,7 +16,7 @@ export default function ProfileScreen() {
   }));
 
   const handleLoginPress = () => {
-    router.push('/auth');
+    router.push('/auth/login');
   };
 
   const handleLogoutPress = () => {
@@ -51,6 +51,7 @@ export default function ProfileScreen() {
               textColor={theme.colors.error}
               onPress={handleLogoutPress}
               style={styles.logoutButton}
+              icon="LogOut"
             />
           </View>
         ) : (
@@ -76,6 +77,7 @@ export default function ProfileScreen() {
               variant="primary"
               onPress={handleLoginPress}
               style={styles.loginButton}
+              icon="LogIn"
             />
           </View>
         )}
