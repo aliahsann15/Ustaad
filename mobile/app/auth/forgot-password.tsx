@@ -17,6 +17,7 @@ import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
+import { Page } from '../../components/Page';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container} scroll>
       <Header title="Recover Password" isSubScreen={true} onBackPress={handleBack} />
 
       <KeyboardAvoidingView
@@ -66,7 +67,7 @@ export default function ForgotPasswordScreen() {
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: 16 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -138,7 +139,7 @@ export default function ForgotPasswordScreen() {
 
       {/* Bottom decorative color border line */}
       <View style={[styles.bottomDecorativeLine, { paddingBottom: insets.bottom }]} />
-    </View>
+    </Page>
   );
 }
 
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
     width: 36, // Balance back button to center "Ustaad" text
   },
   scrollContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
   },
   welcomeSection: {
     marginVertical: 24,

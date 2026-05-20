@@ -11,6 +11,7 @@ export const theme = {
     navBackground: '#1C1C1E',
     
     // 10% Accent (Energy, action, urgency)
+    // primary: '#F59E0B',
     primary: '#F59E0B',
     primaryHover: '#D97706',
     

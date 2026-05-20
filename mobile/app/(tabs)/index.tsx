@@ -14,9 +14,11 @@ import {
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { BotMessageSquare } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Header } from '../../components/Header';
+import { Page } from '../../components/Page';
 import { useBookingStore } from '../../store/useBookingStore';
 
 const SERVICE_SUGGESTIONS = [
@@ -61,128 +63,118 @@ export default function HomeScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
+        <Page style={styles.container}>
 
-        {/* ─── Shared Header ─── */}
-        <Header title="Ustaad" />
+          {/* ─── Shared Header ─── */}
+          <Header title="Ustaad" />
 
-        {/* ─── Main Scrollable Content ─── */}
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <ScrollView
-            contentContainerStyle={[
-              styles.scrollContent,
-              { paddingTop: 16, paddingBottom: insets.bottom + 180 },
-            ]}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
+          {/* ─── Main Scrollable Content ─── */}
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           >
-            {/* ─── Localized Greeting ─── */}
-            <View style={styles.greetingSection}>
-              <Typography style={styles.greetingDisplay}>
-                Assalam-o-Alaikum!
-              </Typography>
-              <Typography style={styles.greetingSubtitle}>
-                Aap ko aaj kis cheez ki zaroorat hai?
-              </Typography>
-            </View>
-
-            {/* ─── Service Suggestion Pills ─── */}
             <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.pillsContainer}
-              style={styles.pillsScroll}
+              contentContainerStyle={[
+                styles.scrollContent,
+                { paddingTop: 16 },
+              ]}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              {SERVICE_SUGGESTIONS.map((chip) => {
-                const isSelected = selectedChip === chip.label;
-                return (
-                  <TouchableOpacity
-                    key={chip.label}
-                    style={[styles.pill, isSelected && styles.pillSelected]}
-                    onPress={() => handleQuickSelect(chip)}
-                    activeOpacity={0.7}
-                  >
-                    <Typography
-                      style={[
-                        styles.pillText,
-                        isSelected && styles.pillTextSelected,
-                      ]}
-                    >
-                      {chip.label}
-                    </Typography>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
-            {/* ─── Illustration / Hero Area ─── */}
-            <View style={styles.heroSection}>
-              {/* Circular illustration container */}
-              <View style={styles.illustrationCircle}>
-                <MaterialIcons name="build" size={80} color={theme.colors.primary} style={{ opacity: 0.3 }} />
-                <View style={styles.illustrationOverlay} />
-                {/* Tool icons decorating the circle */}
-                <View style={[styles.iconBadge, { top: 16, right: 20 }]}>
-                  <MaterialIcons name="electrical-services" size={18} color={theme.colors.primary} />
-                </View>
-                <View style={[styles.iconBadge, { bottom: 20, left: 16 }]}>
-                  <MaterialIcons name="plumbing" size={18} color="#515f74" />
-                </View>
-                <View style={[styles.iconBadge, { top: 40, left: 8 }]}>
-                  <MaterialIcons name="cleaning-services" size={18} color={theme.colors.primary} />
-                </View>
-                {/* Center content */}
-                <View style={styles.illustrationCenter}>
-                  <MaterialIcons name="handyman" size={48} color={theme.colors.primary} />
-                </View>
+              {/* ─── Localized Greeting ─── */}
+              <View style={styles.greetingSection}>
+                <Typography style={styles.greetingDisplay}>
+                  What&apos;s the Vibe Today?
+                </Typography>
+                <Typography style={styles.greetingSubtitle}>
+                  Aap ko aaj kis cheez ki zaroorat hai?
+                </Typography>
               </View>
 
-              <Typography style={styles.heroTitle}>
-                Expert help is a tap away
-              </Typography>
-              <Typography style={styles.heroBody}>
-                Tell Ustaad what&apos;s broken, and we&apos;ll find the right professional for you instantly.
-              </Typography>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-
-        {/* ─── Floating Search Bar + Mic FAB ─── */}
-        <View style={[styles.searchBarWrapper, { bottom: insets.bottom + 88 }]}>
-          <View style={styles.searchRow}>
-            {/* Input */}
-            <View style={styles.searchInputContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Ask Ustaad: e.g., Meray ghar ka fan kharab hai"
-                placeholderTextColor="rgba(25,28,30,0.4)"
-                value={requestText}
-                onChangeText={setRequestText}
-                onSubmitEditing={handleSubmit}
-                returnKeyType="send"
-              />
-            </View>
-
-            {/* Mic / Send FAB */}
-            <Animated.View style={{ transform: [{ scale: micScale }] }}>
-              <TouchableOpacity
-                style={[styles.micFab, micActive && styles.micFabActive, requestText.length > 0 && styles.micFabSend]}
-                onPressIn={handleMicPressIn}
-                onPressOut={handleMicPressOut}
-                onPress={requestText.length > 0 ? handleSubmit : undefined}
-                activeOpacity={0.85}
+              {/* ─── Service Suggestion Pills ─── */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.pillsContainer}
+                style={styles.pillsScroll}
               >
-                <MaterialIcons
-                  name={requestText.length > 0 ? 'arrow-forward' : 'mic'}
-                  size={28}
-                  color="#613b00"
+                {SERVICE_SUGGESTIONS.map((chip) => {
+                  const isSelected = selectedChip === chip.label;
+                  return (
+                    <TouchableOpacity
+                      key={chip.label}
+                      style={[styles.pill, isSelected && styles.pillSelected]}
+                      onPress={() => handleQuickSelect(chip)}
+                      activeOpacity={0.7}
+                    >
+                      <Typography
+                        style={[
+                          styles.pillText,
+                          isSelected && styles.pillTextSelected,
+                        ]}
+                      >
+                        {chip.label}
+                      </Typography>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+
+              {/* ─── Illustration / Hero Area ─── */}
+              <View style={styles.heroSection}>
+                {/* Circular illustration container */}
+                <View style={styles.illustrationCircle}>
+                  {/* Center content */}
+                  <View style={styles.illustrationCenter}>
+                    <BotMessageSquare size={102} color={theme.colors.primary} strokeWidth={1.8} />
+                  </View>
+                </View>
+
+                <Typography style={styles.heroTitle}>
+                  Expert help is a tap away
+                </Typography>
+                <Typography style={styles.heroBody}>
+                  Tell Ustaad what&apos;s broken, and we&apos;ll find the right professional for you instantly.
+                </Typography>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+
+          {/* ─── Floating Search Bar + Mic FAB ─── */}
+          <View style={[styles.searchBarWrapper, { bottom: insets.bottom + 88 }]}>
+            <View style={styles.searchRow}>
+              {/* Input */}
+              <View style={styles.searchInputContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Meray ghar ka fan kharab hai"
+                  placeholderTextColor="rgba(25,28,30,0.4)"
+                  value={requestText}
+                  onChangeText={setRequestText}
+                  onSubmitEditing={handleSubmit}
+                  returnKeyType="send"
                 />
-              </TouchableOpacity>
-            </Animated.View>
+              </View>
+
+              {/* Mic / Send FAB */}
+              <Animated.View style={{ transform: [{ scale: micScale }] }}>
+                <TouchableOpacity
+                  style={[styles.micFab, micActive && styles.micFabActive, requestText.length > 0 && styles.micFabSend]}
+                  onPressIn={handleMicPressIn}
+                  onPressOut={handleMicPressOut}
+                  onPress={requestText.length > 0 ? handleSubmit : undefined}
+                  activeOpacity={0.85}
+                >
+                  <MaterialIcons
+                    name={requestText.length > 0 ? 'arrow-forward' : 'mic'}
+                    size={28}
+                    color={requestText.length > 0 ? theme.colors.primary : theme.colors.textPrimary}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
           </View>
-        </View>
+        </Page>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -196,7 +188,7 @@ const styles = StyleSheet.create({
 
   // ── Scroll Content ──
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
   },
 
   // ── Greeting ──
@@ -267,32 +259,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  illustrationOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '40%',
-    backgroundColor: 'rgba(236,238,240,0.9)',
-  },
   illustrationCenter: {
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  iconBadge: {
-    position: 'absolute',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
   },
   heroTitle: {
     fontSize: 24,
@@ -331,10 +301,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 22,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 6,
+    elevation: 1,
   },
   searchInput: {
     fontSize: 15,
@@ -348,11 +318,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F59E0B',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#F59E0B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 6,
   },
   micFabActive: {
     backgroundColor: '#D97706',

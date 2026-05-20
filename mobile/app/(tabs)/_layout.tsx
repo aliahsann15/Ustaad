@@ -66,22 +66,38 @@ const TabItem = ({ route, isFocused, onPress, index, total, options }: any) => {
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
+  const ALLOWED = ['index', 'activity', 'profile', 'more'];
+  const activeRouteName = state.routes[state.index]?.name ?? '';
+
+  const isRouteFocused = (routeName: string) => {
+    if (activeRouteName === routeName) {
+      return true;
+    }
+
+    return activeRouteName.startsWith(`${routeName}/`);
+  };
+
   return (
     <View style={[styles.tabBarContainer, { bottom: Math.max(16, insets.bottom) }]}>
-      {state.routes.map((route: any, index: number) => {
-        const isFocused = state.index === index;
-        return (
-          <TabItem
-            key={route.key}
-            route={route}
-            isFocused={isFocused}
-            onPress={() => navigation.navigate(route.name)}
-            index={index}
-            total={state.routes.length}
-            options={descriptors[route.key].options}
-          />
-        );
-      })}
+      {state.routes
+        .filter((r: any) => ALLOWED.includes(r.name))
+        .map((route: any, index: number) => {
+          // compute focused by comparing route index within filtered list
+          const visibleRoutes = state.routes.filter((r: any) => ALLOWED.includes(r.name));
+          const visibleIndex = visibleRoutes.findIndex((r: any) => r.key === route.key);
+          const isFocused = isRouteFocused(route.name);
+          return (
+            <TabItem
+              key={route.key}
+              route={route}
+              isFocused={isFocused}
+              onPress={() => navigation.navigate(route.name)}
+              index={visibleIndex}
+              total={visibleRoutes.length}
+              options={descriptors[route.key].options}
+            />
+          );
+        })}
     </View>
   );
 }

@@ -13,7 +13,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { useAuthStore } from '../store/useAuthStore';
-import { Image } from 'expo-image';
+import { Image } from 'react-native';
 
 export default function SplashScreen() {
   const router = useRouter();

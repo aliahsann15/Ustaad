@@ -16,6 +16,7 @@ import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
+import { Page } from '../../components/Page';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function SignupScreen() {
@@ -65,7 +66,7 @@ export default function SignupScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container} scroll>
       <Header title="Create Account" isSubScreen={true} onBackPress={handleBack} />
 
       <KeyboardAvoidingView
@@ -73,7 +74,7 @@ export default function SignupScreen() {
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: 16 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -229,7 +230,7 @@ export default function SignupScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </Page>
   );
 }
 
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     width: 36, // Balance the back button for centering title
   },
   scrollContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
   },
   welcomeSection: {
     marginVertical: 24,

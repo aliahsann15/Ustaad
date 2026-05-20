@@ -10,18 +10,16 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Image } from 'expo-image';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
 import { useAuthStore } from '../../store/useAuthStore';
+import { Page } from '../../components/Page';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
 
   const [identifier, setIdentifier] = useState('');
@@ -52,7 +50,7 @@ export default function LoginScreen() {
       } else {
         Alert.alert('Auth Error', data.error || 'Login failed. Please check your credentials.');
       }
-    } catch (error) {
+    } catch {
       // Fallback local auth for testing
       setAuthenticated(true, identifier, 'local_token', 'local_user_id');
       router.replace('/(tabs)');
@@ -70,7 +68,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container} scroll>
       <Header title="Login" isSubScreen={true} onBackPress={handleBack} />
 
       <KeyboardAvoidingView
@@ -78,7 +76,7 @@ export default function LoginScreen() {
         style={styles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={[styles.scrollContent, { paddingTop: 16, paddingBottom: insets.bottom + 24 }]}
+          contentContainerStyle={[styles.scrollContent, { paddingTop: 16 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -156,20 +154,10 @@ export default function LoginScreen() {
             />
           </View>
 
-          {/* Stitch Designed Team Illustration Card */}
-          <View style={styles.illustrationCard}>
-            <Image
-              source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9_eRv6yR1ahcFvKAp7PaUy45obdoWrxMnvu_BkiE2we-_Pv6R0xQfy3xR2NyYCoAIvncPSAtxgk9wF7wUj0EM4cNCn_Y73uBnB2mbEWaGggGHVJFcyiOGPacZrnFGVnNIO0v1rrKqztyaL9b6LKtK19w3HrT9rcvimgYFEDcseAuR-qXQTJRTt4OdZ9f7dysceT-KUjx1VR3_xgR0sqfNUmDujWRVGuJL8mNKia69JcOK1WAtnfDNSERxcatzVnk9OkaFUodhk9s' }}
-              style={styles.illustrationImage}
-              contentFit="cover"
-              transition={300}
-            />
-          </View>
-
           {/* Signup Redirection */}
           <View style={styles.signupRedirect}>
             <Typography variant="body" color="#534434">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
             </Typography>
             <TouchableOpacity onPress={() => router.push('/auth/signup')}>
               <Typography variant="body" color={theme.colors.primary} weight="bold" style={styles.boldLink}>
@@ -178,28 +166,9 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Dev testing shortcuts */}
-          <View style={styles.devShortcuts}>
-            <Typography variant="caption" color="#94A3B8" style={styles.devLabel}>
-              ─── Testing Bypass ───
-            </Typography>
-            <View style={styles.bypassRow}>
-              <TouchableOpacity
-                onPress={() => {
-                  setAuthenticated(true, '+92 300 1234567', 'bypass_token', 'bypass_user');
-                  router.replace('/(tabs)');
-                }}
-                style={styles.bypassBtn}
-              >
-                <Typography variant="caption" color={theme.colors.primary} weight="bold">
-                  Quick Login (Mock)
-                </Typography>
-              </TouchableOpacity>
-            </View>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </Page>
   );
 }
 
@@ -207,55 +176,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC', // Slate soft grey background matching the specs
+    paddingTop: 44,
   },
   keyboardView: {
     flex: 1,
   },
-  floatingHeader: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#1C1C1E', // Charcoal brand color
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 6,
-    zIndex: 100,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-    flex: 1,
-  },
-  headerSpacer: {
-    width: 36, // Balance back button to center title
-  },
   scrollContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
   },
   welcomeSection: {
-    marginVertical: 24,
+    marginVertical: 40,
     alignItems: 'center',
   },
   title: {
@@ -317,25 +247,6 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     marginTop: 8,
   },
-  illustrationCard: {
-    marginTop: 28,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  illustrationImage: {
-    width: '100%',
-    height: 140,
-    borderRadius: 12,
-  },
   signupRedirect: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -344,26 +255,5 @@ const styles = StyleSheet.create({
   },
   boldLink: {
     fontSize: 15,
-  },
-  devShortcuts: {
-    marginTop: 32,
-    alignItems: 'center',
-    gap: 8,
-  },
-  devLabel: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-  },
-  bypassRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  bypassBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-    borderRadius: 20,
-    backgroundColor: 'rgba(245, 158, 11, 0.05)',
   },
 }) as any;

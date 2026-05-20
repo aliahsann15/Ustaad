@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
@@ -7,6 +7,7 @@ import { Typography } from '../components/Typography';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Header } from '../components/Header';
+import { Page } from '../components/Page';
 
 export default function QuoteScreen() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function QuoteScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container} scroll>
       <Header title="Match Found" isSubScreen={true} />
       <ScrollView contentContainerStyle={styles.content}>
         
@@ -87,7 +88,7 @@ export default function QuoteScreen() {
         </View>
 
       </ScrollView>
-    </View>
+    </Page>
   );
 }
 
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    padding: theme.spacing.xl,
+    paddingVertical: theme.spacing.xl,
   },
   header: {
     alignItems: 'center',

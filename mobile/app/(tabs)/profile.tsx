@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+// import React, { useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Header } from '../../components/Header';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { Page } from '../../components/Page';
 import { Button } from '../../components/Button';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -25,23 +25,13 @@ export default function ProfileScreen() {
   router.replace('/auth-gateway');
 };
 
-  // Keep screen awake while this screen is mounted
-  useEffect(() => {
-    (async () => {
-      try {
-        await activateKeepAwakeAsync();
-      } catch (e) {
-        console.warn('Keep awake activation failed', e);
-      }
-    })();
-    return () => deactivateKeepAwake();
-  }, []);
+  // Keep-awake intentionally disabled to avoid native runtime issues.
 
   // Duplicate login handler removed – the correct handler is defined earlier.
 
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container}>
       <Header title="Profile" />
       <View style={styles.content}>
         {isAuthenticated ? (
@@ -125,7 +115,7 @@ export default function ProfileScreen() {
           </View>
         )}
       </View>
-    </View>
+    </Page>
   );
 }
 
@@ -136,7 +126,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: theme.spacing.xl,
+    paddingVertical: theme.spacing.xl,
   },
   authenticatedContent: {
     flex: 1,

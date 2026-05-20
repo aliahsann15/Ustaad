@@ -6,6 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { Typography } from './Typography';
 
+export const HEADER_HEIGHT = 56;
+export const HEADER_VERTICAL_GAP = 8;
+export const HEADER_MIN_TOP = 12;
+
 interface HeaderProps {
   title: string;
   isSubScreen?: boolean;
@@ -15,6 +19,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ title, isSubScreen = false, onBackPress }) => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const topOffset = Math.max(insets.top, HEADER_MIN_TOP) + HEADER_VERTICAL_GAP;
 
   const handleBack = () => {
     if (onBackPress) {
@@ -25,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ title, isSubScreen = false, onBa
   };
 
   return (
-    <View style={[styles.container, { marginTop: Math.max(insets.top, 12) + 8 }]}>
+    <View style={[styles.container, { top: topOffset }]} pointerEvents="box-none">
       <View style={styles.content}>
         {isSubScreen ? (
           <TouchableOpacity onPress={handleBack} style={styles.backButton} activeOpacity={0.7}>
@@ -48,17 +53,14 @@ export const Header: React.FC<HeaderProps> = ({ title, isSubScreen = false, onBa
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    left: theme.spacing.md,
+    right: theme.spacing.md,
     backgroundColor: theme.colors.navBackground,
     borderRadius: 28, // Premium capsule shape
-    marginHorizontal: 16,
-    height: 56,
+    height: HEADER_HEIGHT,
     justifyContent: 'center',
     paddingHorizontal: 16,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
     zIndex: 100,
   },
   content: {

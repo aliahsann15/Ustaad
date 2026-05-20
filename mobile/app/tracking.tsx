@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,6 +8,8 @@ import { Typography } from '../components/Typography';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Header } from '../components/Header';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Page } from '../components/Page';
 
 export default function TrackingScreen() {
   const router = useRouter();
@@ -26,8 +27,10 @@ export default function TrackingScreen() {
     longitude: 73.0300,
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <Page style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Header title="Live Tracking" isSubScreen={true} />
       
       {/* Map View */}
@@ -53,7 +56,7 @@ export default function TrackingScreen() {
       </View>
 
       {/* Bottom Information Card */}
-      <View style={styles.bottomSheet}>
+      <View style={[styles.bottomSheet, { bottom: insets.bottom + 80 }]}> 
         <Card style={styles.trackingCard}>
           <View style={styles.etaRow}>
             <View>
@@ -85,7 +88,7 @@ export default function TrackingScreen() {
           <Button title="Mark as Completed" style={{ marginTop: theme.spacing.lg }} onPress={() => router.replace('/(tabs)')} />
         </Card>
       </View>
-    </View>
+    </Page>
   );
 }
 

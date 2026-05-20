@@ -1,12 +1,13 @@
 import { Link } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { Header } from '../components/Header';
 import { theme } from '../constants/theme';
+import { Page } from '../components/Page';
 
 export default function ModalScreen() {
   return (
-    <View style={styles.container}>
+    <Page style={styles.container}>
       <Header title="Modal Info" isSubScreen={true} />
       <View style={styles.content}>
         <ThemedText type="title">This is a modal</ThemedText>
@@ -14,7 +15,7 @@ export default function ModalScreen() {
           <ThemedText type="link">Go to home screen</ThemedText>
         </Link>
       </View>
-    </View>
+    </Page>
   );
 }
 

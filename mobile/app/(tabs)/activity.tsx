@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import {
-  View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  View
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
+import { Page } from '../../components/Page';
 import { useAuthStore } from '../../store/useAuthStore';
 
 // ── Types ──────────────────────────────────────────────────────
@@ -146,7 +145,6 @@ function BookingCard({ item, onPress }: { item: Booking; onPress: () => void }) 
 // ── Main Screen ───────────────────────────────────────────────
 export default function ActivityScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
@@ -157,7 +155,7 @@ export default function ActivityScreen() {
 
   if (!isAuthenticated) {
     return (
-      <View style={styles.container}>
+      <Page style={styles.container}>
         <Header title="History" />
 
         {/* Unauthenticated Empty State */}
@@ -177,22 +175,15 @@ export default function ActivityScreen() {
             style={styles.signInButton}
           />
         </View>
-      </View>
+      </Page>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <Page style={styles.container} scroll>
       <Header title="History" />
 
-      {/* ─── Scrollable Content ─── */}
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: theme.spacing.md, paddingBottom: insets.bottom + 100 },
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.scrollContent}>
         {/* ─── Filter Chips ─── */}
         <ScrollView
           horizontal
@@ -249,8 +240,8 @@ export default function ActivityScreen() {
             </TouchableOpacity>
           </View>
         )}
-      </ScrollView>
-    </View>
+      </View>
+    </Page>
   );
 }
 
@@ -262,7 +253,7 @@ const styles = StyleSheet.create({
 
   // ── Scroll ──
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
   },
 
   // ── Filter Chips ──
