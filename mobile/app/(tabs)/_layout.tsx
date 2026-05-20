@@ -2,7 +2,12 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Image } from 'expo-image';
-import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
+import Animated, { 
+  useAnimatedStyle, 
+  withTiming, 
+  useSharedValue 
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 
@@ -24,7 +29,7 @@ const TabItem = ({ route, isFocused, onPress, index, total, options }: any) => {
     flex.value = withTiming(isFocused ? 1.5 : 1, { duration: 250 });
     labelOpacity.value = withTiming(isFocused ? 1 : 0, { duration: 250 });
     labelWidth.value = withTiming(isFocused ? 60 : 0, { duration: 250 });
-  }, [isFocused]);
+  }, [isFocused, flex, labelOpacity, labelWidth]);
 
   const animatedStyle = useAnimatedStyle(() => ({ flex: flex.value }));
   const labelStyle = useAnimatedStyle(() => ({
@@ -37,7 +42,7 @@ const TabItem = ({ route, isFocused, onPress, index, total, options }: any) => {
     <AnimatedTouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      style={[styles.tabItem, animatedStyle, index < total - 1 && styles.divider]}
+      style={[styles.tabItem, animatedStyle]}
     >
       <View style={[styles.tabContainer, isFocused && styles.tabContainerFocused]}>
         <Image 
@@ -48,7 +53,7 @@ const TabItem = ({ route, isFocused, onPress, index, total, options }: any) => {
         <Animated.View style={[labelStyle, { overflow: 'hidden', justifyContent: 'center' }]}>
           <Typography 
             variant="caption" 
-            style={[styles.tabLabel, { color: theme.colors.primary, marginLeft: 0 }]}
+            style={[styles.tabLabel, { color: theme.colors.primary }]}
             numberOfLines={1}
           >
             {options.title || route.name}
@@ -60,8 +65,9 @@ const TabItem = ({ route, isFocused, onPress, index, total, options }: any) => {
 };
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.tabBarContainer}>
+    <View style={[styles.tabBarContainer, { bottom: Math.max(16, insets.bottom) }]}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         return (
@@ -95,40 +101,37 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     backgroundColor: theme.colors.navBackground,
-    height: 85,
+    height: 60,
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: 20,
+    left: 16,
+    right: 16,
+    borderRadius: 36,
     alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 20,
+    justifyContent: 'space-around',
+    paddingHorizontal: 12,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
   tabItem: {
-    height: 40,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  divider: {
-    borderRightWidth: 1,
-    borderRightColor: 'rgba(255, 255, 255, 0.41)',
   },
   tabContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   tabContainerFocused: {
     backgroundColor: 'rgba(245, 158, 11, 0.15)',
     borderRadius: 20,
-    paddingHorizontal: 16,
+    paddingLeft: 20,
+    paddingRight: 14,
   },
   tabLabel: {
     fontFamily: theme.typography.fontFamilies.bold,

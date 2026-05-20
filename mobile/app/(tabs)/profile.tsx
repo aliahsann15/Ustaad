@@ -1,28 +1,44 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Header } from '../../components/Header';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { Button } from '../../components/Button';
+
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { isAuthenticated, phoneNumber, logout } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    phoneNumber: state.phoneNumber,
-    logout: state.logout,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const phoneNumber = useAuthStore((state) => state.phoneNumber);
+  const logout = useAuthStore((state) => state.logout);
 
   const handleLoginPress = () => {
     router.push('/auth/login');
   };
 
   const handleLogoutPress = () => {
-    logout();
-    router.replace('/auth-gateway');
-  };
+  logout();
+  router.replace('/auth-gateway');
+};
+
+  // Keep screen awake while this screen is mounted
+  useEffect(() => {
+    (async () => {
+      try {
+        await activateKeepAwakeAsync();
+      } catch (e) {
+        console.warn('Keep awake activation failed', e);
+      }
+    })();
+    return () => deactivateKeepAwake();
+  }, []);
+
+  // Duplicate login handler removed – the correct handler is defined earlier.
+
 
   return (
     <View style={styles.container}>
@@ -43,6 +59,33 @@ export default function ProfileScreen() {
               <Typography variant="body" color={theme.colors.textSecondary}>
                 {phoneNumber ? `+${phoneNumber}` : 'Guest User'}
               </Typography>
+            </View>
+            {/* Edit Profile Button */}
+            <Button
+              title="Edit Profile"
+              variant="primary"
+              onPress={() => router.push('/profile/edit')}
+              style={styles.editProfileButton}
+            />
+
+            {/* Settings Sections */}
+            <View style={styles.sectionsContainer}>
+              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/addresses')} activeOpacity={0.8}>
+                <MaterialIcons name="location-on" size={24} color={theme.colors.textSecondary} />
+                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>Saved Addresses</Typography>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/payments')} activeOpacity={0.8}>
+                <MaterialIcons name="payment" size={24} color={theme.colors.textSecondary} />
+                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>Payment Methods</Typography>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/language')} activeOpacity={0.8}>
+                <MaterialIcons name="language" size={24} color={theme.colors.textSecondary} />
+                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>App Language</Typography>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/settings')} activeOpacity={0.8}>
+                <MaterialIcons name="settings" size={24} color={theme.colors.textSecondary} />
+                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>App Settings</Typography>
+              </TouchableOpacity>
             </View>
 
             <Button
@@ -129,11 +172,34 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamilies.bold,
     marginBottom: theme.spacing.xs,
   },
+  sectionsContainer: {
+    width: '100%',
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  sectionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  sectionLabel: {
+    marginLeft: theme.spacing.sm,
+    fontFamily: theme.typography.fontFamilies.medium,
+    color: theme.colors.textPrimary,
+  },
   logoutButton: {
     width: '100%',
     height: 52,
     borderRadius: theme.borderRadius.full,
+    borderWidth: 1,
     borderColor: theme.colors.error,
+  },
+  editProfileButton: {
+    width: '100%',
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   unauthenticatedContent: {
     flex: 1,

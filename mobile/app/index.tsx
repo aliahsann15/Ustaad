@@ -13,6 +13,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { useAuthStore } from '../store/useAuthStore';
+import { Image } from 'expo-image';
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -78,7 +79,11 @@ export default function SplashScreen() {
       <Animated.View style={[styles.brandContainer, logoAnimatedStyle]}>
         {/* Squircle Logo Icon with Handyman graphic */}
         <View style={styles.logoIcon}>
-          <MaterialIcons name="handyman" size={46} color="#1C1C1E" />
+          {/* <MaterialIcons name="handyman" size={46} color="#1C1C1E" /> */}
+          <Image
+            source={require('../assets/logomark.png')}
+            style={styles.logoImage}
+          />
         </View>
 
         {/* Brand Typography */}
@@ -100,7 +105,7 @@ export default function SplashScreen() {
         {/* Version Info */}
         <View style={styles.versionContainer}>
           <Typography variant="caption" color="rgba(148, 163, 184, 0.4)" style={styles.versionText}>
-            Version 2.4.1
+            Version {process.env.EXPO_PUBLIC_APP_VERSION}
           </Typography>
           <View style={styles.divider} />
         </View>
@@ -172,7 +177,8 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 28, // Squircle profile
-    backgroundColor: theme.colors.primary, // #F59E0B Amber
+    // backgroundColor: theme.colors.primary, // #F59E0B Amber
+    backgroundColor: theme.colors.background, // #D8C3AD Background color of the app
     alignItems: 'center',
     justifyContent: 'center',
     transform: [{ rotate: '12deg' }],
@@ -181,6 +187,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 16,
     elevation: 10,
+  },
+  logoImage: {
+    transform: [{ rotate: '-12deg' }],
+    width: 72,
+    height: 72,
   },
   textWrapper: {
     marginTop: 28,
