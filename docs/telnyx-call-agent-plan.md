@@ -6,15 +6,16 @@ Status: Draft
 
 Implement a Telnyx-based call agent in the backend that will place an outbound voice call to a provider chosen by the user from the recommendation results. The call agent will:
 
-- Initiate an outbound call to the provider's verified phone number when the user elects to "Call" or "Contact" the recommended provider.
-- Provide a configurable voice prompt that includes job details (service type, address/time) and optionally collects DTMF input (e.g., confirm/accept).
+- Initiate an outbound call to the provider's verified phone number when the user taps `Schedule` on the Quote screen.
+- Provide a configurable voice prompt that includes the service type, the needed location, and asks the provider what time they can provide the service.
+- Optionally collect DTMF input after the provider states availability, for example to confirm acceptance or request a callback.
 - Relay call status and events back to the mobile client (via webhook updates persisted to the DB and optionally pushed to the client via WebSocket / push notifications).
 - Securely store and manage Telnyx credentials and provide retries and observability.
 
 ## High-Level Architecture
 
-- Mobile client: user selects a provider from recommendations and taps `Schedule`.
-- Backend API: receives `POST /api/calls` with userId, providerId, serviceRequestId (optional), and `callOptions`.
+- Mobile client: user selects a provider from recommendations on the Quote screen and taps `Schedule`.
+- Backend API: receives `POST /api/calls` with userId, providerId, serviceRequestId (optional), and `callOptions` that include the service location, service type, and schedule context.
 - Call Orchestrator (new controller/service): validates provider phone, prepares call metadata, persists a `Call` record, and instructs Telnyx to place the call via its REST API.
 - Telnyx: handles PSTN call, connects to provider phone, and optionally runs a webhook-specified call control (TwiML-like) or plays a TTS prompt.
 - Webhooks: Telnyx posts events (call initiated, ringing, answered, completed, failed) to our configured webhook endpoint `/api/telnyx/webhook`.
@@ -89,7 +90,9 @@ Request:
   "serviceRequestId": "<optional>",
   "callOptions": {
     "userMessage": "Optional override message to play",
-    "collectDTMF": true
+    "collectDTMF": true,
+    "serviceLocation": "123 Main St",
+    "serviceType": "Plumbing"
   }
 }
 ```
@@ -101,7 +104,8 @@ Behavior:
 3. Create a `Call` record in DB with status `requested`.
 4. Prepare call control payload (TTS content or Telnyx Call Control instructions). Include metadata: serviceRequestId, callId.
 5. Call Telnyx REST API to place a call. Save returned `telnyxCallId` and update status to `initiated`.
-6. Return call record to client (id and status). Client displays call progress via polling or realtime updates.
+6. When the provider answers, play a prompt like: "Hello, this is Ustaad. We have a service request for <service type> at <location>. What time can you provide the service?"
+7. Return call record to client (id and status). Client displays call progress via polling or realtime updates.
 
 Example call initiation (pseudo):
 
@@ -129,7 +133,8 @@ Telnyx supports two patterns: basic outbound call creation and Call Control wher
 - For each event:
   - Locate `Call` by `telnyxCallId` (or use mapping by our generated `callId` if included in the `call_control` webhook fields).
   - Append event to `call.events` and update `call.status` accordingly.
-  - If `call.answered` and we expect to play a TTS prompt, respond with the call control instructions (Telnyx may expect immediate response in some flows) or use the Telnyx Call Control REST API to play TTS / gather DTMF.
+  - If `call.answered`, play a TTS prompt that explains the service request and asks what time the provider can arrive at the location.
+  - If the provider responds with DTMF or speech input, store the availability response and mark the call ready for the next workflow step.
   - If `dtmf` received and `collectDTMF` enabled: store DTMF and consider that provider accepted/confirmed.
   - If `completed` with `recording_url` — persist recording URL for audit.
 
@@ -140,7 +145,7 @@ When the call is answered, instruct Telnyx to play TTS and optionally collect DT
 ```json
 {
   "instructions": [
-    { "action": "play", "text": "Hello, this is Ustaad. You have a new job: plumbing at 123 Main St. Press 1 to accept." },
+    { "action": "play", "text": "Hello, this is Ustaad. We have a service request for plumbing at 123 Main St. What time can you provide the service?" },
     { "action": "gather", "num_digits": 1, "timeout": 10 }
   ]
 }

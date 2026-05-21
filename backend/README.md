@@ -65,7 +65,16 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 # External APIs
 GOOGLE_MAPS_API_KEY=your_google_maps_key_here
+
+# Telnyx Call Agent
+TELNYX_API_KEY=your_telnyx_api_key_here
+TELNYX_CONNECTION_ID=your_telnyx_connection_id_here
+TELNYX_FROM_NUMBER=+923001234567
+TELNYX_WEBHOOK_SECRET=your_telnyx_webhook_public_key_or_secret_here
+TELNYX_WEBHOOK_URL=https://your-ngrok-or-production-host/api/telnyx/webhook
 ```
+
+The Telnyx call agent is triggered from the mobile Quote screen when the user taps `Schedule`. The backend creates a call record, places the outbound call, then uses a Telnyx webhook/call-control flow to ask the provider what time they can provide the service at the requested location.
 
 ### 4. Running the Server
 

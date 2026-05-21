@@ -35,7 +35,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
 
     try {
-      const data = await forgotPasswordMock({ identifier });
+      const data = await forgotPasswordMock({ identifier }) as any;
       setLoading(false);
       setCodeSent(true);
       Alert.alert(

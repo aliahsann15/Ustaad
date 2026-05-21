@@ -47,7 +47,7 @@ export default function SignupScreen() {
         phoneNumber: phone,
         password,
         languagePreference: 'ur-Latn',
-      });
+      }) as any;
 
       setAuthenticated(true, data.user?.phoneNumber || phone, data.token || 'signup_mock_token', data.user?._id || 'signup_mock_user');
       setTimeout(() => {

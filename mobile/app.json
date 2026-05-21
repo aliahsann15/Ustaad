@@ -24,11 +24,17 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/logomark_foreground.png"
     },
     "plugins": [
       "expo-router",
       "./plugins/withAsyncStorageLocalRepo",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
       [
         "expo-splash-screen",
         {

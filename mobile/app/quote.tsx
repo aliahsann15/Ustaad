@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, ScrollView, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, ScrollView, View, Image, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
@@ -9,14 +9,57 @@ import { Button } from '../components/Button';
 import { Header } from '../components/Header';
 import { Page } from '../components/Page';
 import { useBookingStore } from '../store/useBookingStore';
+import { useAuthStore } from '../store/useAuthStore';
+import { createProviderCall } from '../lib/api';
 
 export default function QuoteScreen() {
   const router = useRouter();
   const matchedProvider = useBookingStore((state) => state.matchedProvider);
   const otherProviders = useBookingStore((state) => state.otherProviders);
+  const serviceRequestId = useBookingStore((state) => state.serviceRequestId);
+  const setActiveCall = useBookingStore((state) => state.setActiveCall);
+  const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
+  const [loading, setLoading] = useState(false);
 
-  const handleConfirm = () => {
-    router.replace('/tracking');
+  const handleConfirm = async () => {
+    if (!matchedProvider?._id) {
+      Alert.alert('Missing provider', 'Please select a provider recommendation first.');
+      return;
+    }
+
+    if (!serviceRequestId) {
+      Alert.alert('Missing request', 'The service request is not available yet. Please submit the request again.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await createProviderCall(
+        {
+          providerId: matchedProvider._id,
+          serviceRequestId,
+          callOptions: {
+            serviceType: matchedProvider.skills?.[0] || 'service',
+          },
+        },
+        { token, userId },
+      ) as any;
+
+      setActiveCall({
+        callId: response.call?._id || response.call?.id || response.callId || 'pending-call',
+        status: response.call?.status || 'initiated',
+        promptText: response.promptText,
+        providerName: matchedProvider.name,
+        providerPhoneNumber: matchedProvider.phoneNumber,
+      });
+
+      router.replace('/tracking');
+    } catch (error) {
+      Alert.alert('Call failed', (error as Error).message || 'Unable to start the provider call.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -35,7 +78,7 @@ export default function QuoteScreen() {
         <Card style={styles.providerCard}>
           <View style={styles.ribbon}><Typography variant="caption" weight="bold" color="#fff">BEST MATCH</Typography></View>
           <View style={styles.providerHeaderTop}>
-            <Image source={ matchedProvider?.avatar ? { uri: matchedProvider.avatar } : require('../assets/logomark.png') } style={styles.avatarBig} />
+            <Image source={matchedProvider?.avatar ? { uri: matchedProvider.avatar } : require('../assets/logomark.png')} style={styles.avatarBig} />
             <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
               <Typography variant="h2">{matchedProvider?.name || 'Asif Plumber'}</Typography>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
@@ -52,21 +95,19 @@ export default function QuoteScreen() {
           </Typography>
         </Card>
 
-        <Typography variant="h3" style={{ marginBottom: theme.spacing.sm }}>Nearby Professional</Typography>
+        {/* <Typography variant="h3" style={{ marginBottom: theme.spacing.sm }}>Nearby Professional</Typography>
         <Card style={styles.bannerCard}>
-          <Image source={ require('../assets/logomark.png') } style={styles.bannerImage} resizeMode="cover" />
+          <Image source={require('../assets/logomark.png')} style={styles.bannerImage} resizeMode="cover" />
           <View style={styles.bannerBadge}><Typography variant="caption" color="#fff">2.4 km away</Typography></View>
-        </Card>
+        </Card> */}
 
         <Typography variant="h3" style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>Alternative Providers</Typography>
 
-        <FlatList
-          data={otherProviders && otherProviders.length ? otherProviders : []}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <Card style={styles.altCard}>
+        <View>
+          {(otherProviders && otherProviders.length ? otherProviders : []).map((item, index) => (
+            <Card style={styles.altCard} key={index}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image source={ item.avatar ? { uri: item.avatar } : require('../assets/logomark.png') } style={styles.altAvatar} />
+                <Image source={item.avatar ? { uri: item.avatar } : require('../assets/logomark.png')} style={styles.altAvatar} />
                 <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
                   <Typography variant="h3">{item.name}</Typography>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
@@ -79,16 +120,16 @@ export default function QuoteScreen() {
                 </TouchableOpacity>
               </View>
             </Card>
-          )}
-          ListEmptyComponent={() => (
+          ))}
+          {(!otherProviders || otherProviders.length === 0) && (
             <View style={{ paddingVertical: 8 }}>
               <Typography variant="body" color={theme.colors.textSecondary}>No alternatives found.</Typography>
             </View>
           )}
-        />
+        </View>
 
         <View style={styles.actions}>
-          <Button title="Schedule Service" onPress={handleConfirm} style={{ marginBottom: theme.spacing.md, backgroundColor: '#F6A300' }} />
+          <Button title="Schedule Service" onPress={handleConfirm} loading={loading} style={{ marginBottom: theme.spacing.md, backgroundColor: '#F6A300' }} />
           <Button title="Cancel Recommendation" variant="outline" onPress={handleCancel} />
         </View>
 

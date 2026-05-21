@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 type ApiOptions = {
   method?: string;
@@ -81,6 +81,35 @@ export const getMyBookings = (auth: { token?: string | null; userId?: string | n
 
 export const getCurrentUser = (auth: { token?: string | null; userId?: string | null }) => {
   return apiRequest('/users/me', {
+    method: 'GET',
+    token: auth.token,
+    userId: auth.userId,
+  });
+};
+
+export const createProviderCall = (
+  payload: {
+    providerId: string;
+    serviceRequestId?: string | null;
+    callOptions?: {
+      userMessage?: string;
+      collectDTMF?: boolean;
+      serviceLocation?: string;
+      serviceType?: string;
+    };
+  },
+  auth: { token?: string | null; userId?: string | null },
+) => {
+  return apiRequest('/calls', {
+    method: 'POST',
+    body: payload,
+    token: auth.token,
+    userId: auth.userId,
+  });
+};
+
+export const getCall = (callId: string, auth: { token?: string | null; userId?: string | null }) => {
+  return apiRequest(`/calls/${callId}`, {
     method: 'GET',
     token: auth.token,
     userId: auth.userId,

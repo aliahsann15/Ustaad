@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '../components/themed-text';
 import { Header } from '../components/Header';
 import { theme } from '../constants/theme';

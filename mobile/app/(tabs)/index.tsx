@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import { Page } from '../../components/Page';
 import { useBookingStore } from '../../store/useBookingStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { submitServiceRequest } from '../../lib/api';
+import { useVoice } from '../../hooks/useVoice';
 
 const SERVICE_SUGGESTIONS = [
   { label: 'Plumber', query: 'I need a Plumber' },
@@ -122,12 +123,14 @@ export default function HomeScreen() {
   // Voice recording hook
   // Use Android emulator host loopback by default; adjust `apiUrl` for device if needed
   // 10.0.2.2 -> Android emulator, use local IP for real devices
-  const { isRecording, startRecording, stopRecordingAndTranscribe, transcription } = (require('../../hooks/useVoice') as any)({ apiUrl: 'http://10.0.2.2:5000/api/transcribe' });
+  const { isRecording, startRecording, stopRecordingAndTranscribe, transcription } = useVoice({ apiUrl: 'http://10.0.2.2:5000/api/transcribe' });
 
   // When transcription arrives, populate the input
-  if (transcription && transcription.length > 0 && transcription !== requestText) {
-    setRequestText(transcription);
-  }
+  useEffect(() => {
+    if (transcription && transcription.length > 0 && transcription !== requestText) {
+      setRequestText(transcription);
+    }
+  }, [transcription, requestText]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>

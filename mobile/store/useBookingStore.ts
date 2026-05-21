@@ -29,6 +29,13 @@ interface BookingState {
   serviceRequestId: string | null;
   bookingId: string | null;
   status: 'idle' | 'matching' | 'matched' | 'en_route' | 'completed';
+  activeCall: {
+    callId: string;
+    status: string;
+    promptText?: string;
+    providerName?: string;
+    providerPhoneNumber?: string;
+  } | null;
   agentLogs: string[];
   matchedProvider: Provider | null;
   priceBreakdown: PriceBreakdown | null;
@@ -37,6 +44,7 @@ interface BookingState {
   setStatus: (status: BookingState['status']) => void;
   addAgentLog: (log: string) => void;
   setProvider: (provider: Provider) => void;
+  setActiveCall: (call: BookingState['activeCall']) => void;
   setBackendResult: (payload: {
     serviceRequestId?: string | null;
     bookingId?: string | null;
@@ -53,6 +61,7 @@ export const useBookingStore = create<BookingState>((set) => ({
   serviceRequestId: null,
   bookingId: null,
   status: 'idle',
+  activeCall: null,
   agentLogs: [],
   matchedProvider: null,
   otherProviders: [],
@@ -61,6 +70,7 @@ export const useBookingStore = create<BookingState>((set) => ({
   setStatus: (status) => set({ status }),
   addAgentLog: (log) => set((state) => ({ agentLogs: [...state.agentLogs, log] })),
   setProvider: (provider) => set({ matchedProvider: provider }),
+  setActiveCall: (call) => set({ activeCall: call }),
   setBackendResult: (payload) => set((state) => ({
     serviceRequestId: payload.serviceRequestId ?? state.serviceRequestId,
     bookingId: payload.bookingId ?? state.bookingId,
@@ -74,6 +84,7 @@ export const useBookingStore = create<BookingState>((set) => ({
     serviceRequestId: null,
     bookingId: null,
     status: 'idle',
+    activeCall: null,
     agentLogs: [],
     matchedProvider: null,
     priceBreakdown: null,

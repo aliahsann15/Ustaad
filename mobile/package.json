@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "postinstall": "node ./scripts/ensure-expo-av-cmake.js || true",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "./scripts/run-android-device.sh",
     "android:device": "./scripts/run-android-device.sh",
@@ -30,7 +29,7 @@
     "expo-linking": "~8.0.11",
     "expo-router": "~6.0.23",
     "expo-splash-screen": "~31.0.13",
-    "expo-av": "~14.0.4",
+    "expo-audio": "~55.0.14",
     "expo-status-bar": "~3.0.9",
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",

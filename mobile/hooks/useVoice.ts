@@ -1,47 +1,52 @@
-import { useState, useRef } from 'react';
-import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+import { useEffect, useState } from 'react';
+import {
+  AudioModule,
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioRecorder,
+  useAudioRecorderState,
+} from 'expo-audio';
 
 export const useVoice = (opts?: { apiUrl?: string }) => {
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const recording = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recordingState = useAudioRecorderState(recording);
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState<string | null>(null);
   const apiUrl = opts?.apiUrl ?? 'http://10.0.2.2:5000/api/transcribe';
 
+  useEffect(() => {
+    setIsRecording(recordingState.isRecording);
+  }, [recordingState.isRecording]);
+
   const startRecording = async () => {
     try {
-      const permission = await Audio.requestPermissionsAsync();
+      const permission = await AudioModule.requestRecordingPermissionsAsync();
       if (!permission.granted) throw new Error('Microphone permission required');
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const rec = new Audio.Recording();
-      await rec.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
-      await rec.startAsync();
-      setRecording(rec);
+      await recording.prepareToRecordAsync();
+      recording.record();
       setIsRecording(true);
-      return rec;
+      return recording;
     } catch (error) {
       throw error;
     }
   };
 
   const stopRecordingAndTranscribe = async () => {
-    if (!recording) return null;
     try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await recording.stop();
+      const uri = recording.uri;
       setIsRecording(false);
-      setRecording(null);
 
       if (!uri) throw new Error('No recording uri');
 
       // read file and POST as multipart/form-data
       const formData = new FormData();
-      const fileInfo = await FileSystem.getInfoAsync(uri);
       const fileType = 'audio/m4a';
 
       formData.append('audio', {
@@ -60,7 +65,6 @@ export const useVoice = (opts?: { apiUrl?: string }) => {
       return t;
     } catch (error) {
       setIsRecording(false);
-      setRecording(null);
       throw error;
     }
   };

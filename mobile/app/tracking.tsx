@@ -15,6 +15,7 @@ import { useBookingStore } from '../store/useBookingStore';
 export default function TrackingScreen() {
   const router = useRouter();
   const matchedProvider = useBookingStore((state) => state.matchedProvider);
+  const activeCall = useBookingStore((state) => state.activeCall);
 
   // Mock coordinates for Islamabad, Pakistan
   const customerRegion = {
@@ -53,7 +54,9 @@ export default function TrackingScreen() {
       <View style={styles.headerSafe}>
         <View style={styles.headerPill}>
           <View style={styles.pulsingDot} />
-          <Typography variant="body" weight="bold" color={theme.colors.textPrimary}>Provider En-Route</Typography>
+          <Typography variant="body" weight="bold" color={theme.colors.textPrimary}>
+            {activeCall ? 'Provider Call In Progress' : 'Provider En-Route'}
+          </Typography>
         </View>
       </View>
 
@@ -62,8 +65,8 @@ export default function TrackingScreen() {
         <Card style={styles.trackingCard}>
           <View style={styles.etaRow}>
             <View>
-              <Typography variant="h2">18 mins</Typography>
-              <Typography variant="caption">Estimated Arrival</Typography>
+              <Typography variant="h2">{activeCall ? 'Calling' : '18 mins'}</Typography>
+              <Typography variant="caption">{activeCall ? 'Awaiting provider availability' : 'Estimated Arrival'}</Typography>
             </View>
             <View style={styles.contactActions}>
               <View style={[styles.circleButton, { backgroundColor: '#25D366' }]}>
@@ -88,7 +91,7 @@ export default function TrackingScreen() {
             <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
               <Typography variant="h3">{matchedProvider?.name || 'Ali Raza'}</Typography>
               <Typography variant="caption">
-                {matchedProvider?.skills?.length ? `${matchedProvider.skills.join(' • ')}` : 'AC Technician • Toyota Corolla (AB-1234)'}
+                {activeCall?.promptText || (matchedProvider?.skills?.length ? `${matchedProvider.skills.join(' • ')}` : 'AC Technician • Toyota Corolla (AB-1234)')}
               </Typography>
             </View>
           </View>
