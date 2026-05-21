@@ -32,16 +32,19 @@ export const createServiceRequest = async (req: AuthRequest, res: Response) => {
       userId
     );
 
-    const booking = agentResult.status === 'success' && agentResult.booking
-      ? await Booking.findById(agentResult.booking._id).populate('providerId')
-      : null;
+    let booking = null;
+    if (agentResult && (agentResult as any).booking) {
+      booking = await Booking.findById((agentResult as any).booking._id).populate('providerId');
+    }
 
+    // Prefer agent-provided matches (recommendedProvider / matchedProviders). Do NOT return any pricing information.
     res.status(201).json({
       serviceRequest,
       agentResult,
-      booking,
-      matchedProvider: booking?.providerId || null,
-      priceBreakdown: booking?.priceBreakdown || null,
+      booking: booking || null,
+      recommendedProvider: agentResult.recommendedProvider || null,
+      otherProviders: agentResult.otherProviders || [],
+      matchedProviders: agentResult.matchedProviders || [],
       intent: agentResult.intent || serviceRequest.extractedIntent || null,
     });
   } catch (error) {

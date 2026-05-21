@@ -6,10 +6,10 @@ export interface IBooking extends Document {
   providerId: mongoose.Types.ObjectId;
   scheduledTime: Date;
   priceBreakdown: {
-    visitFee: number;
-    distanceCost: number;
-    urgencyAdjustment: number;
-    totalEstimated: number;
+    visitFee?: number;
+    distanceCost?: number;
+    urgencyAdjustment?: number;
+    totalEstimated?: number;
   };
   status: 'requested' | 'confirmed' | 'en_route' | 'in_progress' | 'completed' | 'disputed' | 'cancelled';
   disputeDetails?: {
@@ -31,10 +31,10 @@ const BookingSchema: Schema = new Schema({
   providerId: { type: Schema.Types.ObjectId, ref: 'Provider', required: true },
   scheduledTime: { type: Date, required: true },
   priceBreakdown: {
-    visitFee: { type: Number, required: true },
-    distanceCost: { type: Number, required: true },
-    urgencyAdjustment: { type: Number, required: true },
-    totalEstimated: { type: Number, required: true },
+    visitFee: { type: Number },
+    distanceCost: { type: Number },
+    urgencyAdjustment: { type: Number },
+    totalEstimated: { type: Number },
   },
   status: { 
     type: String, 

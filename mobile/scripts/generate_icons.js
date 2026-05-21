@@ -32,14 +32,15 @@ async function run() {
     const outIcon = path.join(root, 'assets', 'logomark_icon_512.png');
     const outForeground = path.join(root, 'assets', 'logomark_foreground.png');
 
-    // Create a 512x512 icon with padding. Default logo scale is 70%.
+    // Create a 512x512 icon with padding. Default logo scale is 82%.
     // You can override with CLI: `node scripts/generate_icons.js --scale=0.5`
     const size = 512;
     const arg = process.argv.find((a) => a.startsWith('--scale='));
-    const logoScale = arg ? Math.max(0.1, Math.min(0.95, parseFloat(arg.split('=')[1]) || 0.7)) : (process.env.ICON_SCALE ? Math.max(0.1, Math.min(0.95, parseFloat(process.env.ICON_SCALE) || 0.7)) : 0.7);
+    const logoScale = arg ? Math.max(0.1, Math.min(0.95, parseFloat(arg.split('=')[1]) || 0.82)) : (process.env.ICON_SCALE ? Math.max(0.1, Math.min(0.95, parseFloat(process.env.ICON_SCALE) || 0.82)) : 0.82);
     const logoSize = Math.round(size * logoScale);
 
-    const logoBuffer = await sharp(src).resize({ width: logoSize, height: logoSize, fit: 'contain' }).png().toBuffer();
+    const sourceLogo = sharp(src).trim();
+    const logoBuffer = await sourceLogo.resize({ width: logoSize, height: logoSize, fit: 'contain' }).png().toBuffer();
 
     const composite = await sharp({
         create: {
@@ -57,7 +58,7 @@ async function run() {
 
     // Foreground image for Android adaptive icon: leave transparent background
     const fgSize = 432; // Android recommended foreground size
-    await sharp(src).resize({ width: Math.round(fgSize * logoScale), height: Math.round(fgSize * logoScale), fit: 'contain' })
+    await sharp(src).trim().resize({ width: Math.round(fgSize * logoScale), height: Math.round(fgSize * logoScale), fit: 'contain' })
         .png()
         .toFile(outForeground);
 

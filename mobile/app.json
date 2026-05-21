@@ -4,11 +4,12 @@
     "slug": "ustaad",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/logomark_icon_512.png",
+    "icon": "./assets/logomark_foreground.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "icon": "./assets/logomark_foreground.png",
       "supportsTablet": true,
       "bundleIdentifier": "com.aliahsann15.mobile"
     },
@@ -27,6 +28,7 @@
     },
     "plugins": [
       "expo-router",
+      "./plugins/withAsyncStorageLocalRepo",
       [
         "expo-splash-screen",
         {
@@ -43,6 +45,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f8e47b17-4e6a-4d7c-8f43-1b0d9b414c96"
+      }
+    },
+    "owner": "aliahsann15"
   }
 }

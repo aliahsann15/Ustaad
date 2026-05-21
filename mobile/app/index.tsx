@@ -10,10 +10,13 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '../constants/theme';
 import { Typography } from '../components/Typography';
 import { useAuthStore } from '../store/useAuthStore';
 import { Image } from 'react-native';
+
+const FIRST_LAUNCH_KEY = 'ustaad:first-launch-complete';
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -23,11 +26,19 @@ export default function SplashScreen() {
   const scale = useSharedValue(0.9);
   const glowOpacity = useSharedValue(0.4);
 
-  const navigateToNext = () => {
-    if (isAuthenticated) {
+  const navigateToNext = async () => {
+    try {
+      const hasLaunchedBefore = await AsyncStorage.getItem(FIRST_LAUNCH_KEY);
+
+      if (!hasLaunchedBefore) {
+        await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true');
+        router.replace('/auth-gateway');
+        return;
+      }
+
       router.replace('/(tabs)');
-    } else {
-      router.replace('/auth-gateway');
+    } catch {
+      router.replace('/(tabs)');
     }
   };
 

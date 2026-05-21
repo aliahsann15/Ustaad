@@ -91,7 +91,7 @@ export const searchProvidersTool = async (serviceType: string, urgency: string, 
     return { provider: p, matchScore: score };
   }).sort((a, b) => b.matchScore - a.matchScore);
 
-  return { matchedProviders: ranked.slice(0, 3) }; // Return top 3
+  return { matchedProviders: ranked.slice(0, 4) }; // Return top 4
 };
 
 export const calculatePricingTool = (baseRate: number, urgency: string, complexityLevel: string, distanceKm: number) => {

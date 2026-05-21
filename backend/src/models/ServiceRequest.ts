@@ -38,6 +38,7 @@ const ServiceRequestSchema: Schema = new Schema({
   languageConfidenceScore: { type: Number },
   status: { type: String, enum: ['pending', 'clarification_needed', 'matched', 'failed'], default: 'pending' },
   clarificationQuestions: [{ type: String }],
+  matchedProviders: [{ type: Schema.Types.ObjectId, ref: 'Provider' }],
 }, { timestamps: true });
 
 export default mongoose.model<IServiceRequest>('ServiceRequest', ServiceRequestSchema);

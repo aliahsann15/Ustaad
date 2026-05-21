@@ -11,7 +11,13 @@ import { theme } from '../../constants/theme';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getCurrentUser, updateCurrentUser } from '../../lib/api';
 
-const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80';
+const DEFAULT_AVATAR = require('../../assets/images/user.png');
+
+type SelectedImage = {
+  uri: string;
+  name: string;
+  type: string;
+};
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -21,7 +27,8 @@ export default function EditProfileScreen() {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('+92 300 1234567');
   const [address, setAddress] = useState('');
-  const [profileImage, setProfileImage] = useState<string>(DEFAULT_AVATAR);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -33,10 +40,51 @@ export default function EditProfileScreen() {
         setEmail(typeof user?.email === 'string' ? user.email.trim() : '');
         setPhoneNumber(user?.phoneNumber || '+92 300 1234567');
         setAddress(typeof user?.address === 'string' ? user.address.trim() : '');
-        setProfileImage(user?.profileImage || DEFAULT_AVATAR);
+        setProfileImage(typeof user?.profileImage === 'string' && user.profileImage.trim() ? user.profileImage.trim() : null);
+        setSelectedImage(null);
       })
       .catch(() => {});
   }, [token, userId]);
+
+  const handlePickImage = async () => {
+    let ImagePickerModule: typeof import('expo-image-picker');
+
+    try {
+      ImagePickerModule = await import('expo-image-picker');
+    } catch {
+      Alert.alert('Photo picker unavailable', 'Please rebuild the app so the image picker native module is included.');
+      return;
+    }
+
+    const permission = await ImagePickerModule.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert('Permission required', 'Please allow access to your photos to choose a profile image.');
+      return;
+    }
+
+    const result = await ImagePickerModule.launchImageLibraryAsync({
+      mediaTypes: ImagePickerModule.MediaTypeOptions.Images,
+      quality: 0.85,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+
+    if (result.canceled || !result.assets?.length) {
+      return;
+    }
+
+    const asset = result.assets[0];
+    const fileName = asset.fileName || `profile-${Date.now()}.jpg`;
+    const mimeType = asset.mimeType || 'image/jpeg';
+
+    setProfileImage(asset.uri);
+    setSelectedImage({
+      uri: asset.uri,
+      name: fileName,
+      type: mimeType,
+    });
+  };
 
   const handleSave = async () => {
     if (!token || !userId) {
@@ -47,17 +95,32 @@ export default function EditProfileScreen() {
     setSaving(true);
 
     try {
-      await updateCurrentUser(
-        userId,
-        {
-          name: name.trim(),
-          email: email.trim() || undefined,
-          phoneNumber: phoneNumber.trim(),
-          address: address.trim() || undefined,
-          profileImage,
-        },
-        { token, userId },
-      );
+      if (selectedImage) {
+        const formData = new FormData();
+
+        formData.append('name', name.trim());
+        if (email.trim()) formData.append('email', email.trim());
+        formData.append('phoneNumber', phoneNumber.trim());
+        if (address.trim()) formData.append('address', address.trim());
+        formData.append('profileImage', {
+          uri: selectedImage.uri,
+          name: selectedImage.name,
+          type: selectedImage.type,
+        } as unknown as Blob);
+
+        await updateCurrentUser(userId, formData, { token, userId });
+      } else {
+        await updateCurrentUser(
+          userId,
+          {
+            name: name.trim(),
+            email: email.trim() || undefined,
+            phoneNumber: phoneNumber.trim(),
+            address: address.trim() || undefined,
+          },
+          { token, userId },
+        );
+      }
 
       Alert.alert('Profile updated', 'Your changes were saved successfully.');
       router.back();
@@ -75,8 +138,12 @@ export default function EditProfileScreen() {
       <View style={styles.content}>
         <View style={styles.avatarSection}>
           <View style={styles.avatarWrap}>
-            <Image source={{ uri: profileImage }} style={styles.avatar} contentFit="cover" />
-            <TouchableOpacity style={styles.cameraBubble} activeOpacity={0.85} onPress={() => Alert.alert('Profile photo', 'Photo upload picker is not installed in this app yet.')}>
+            <Image
+              source={profileImage ? { uri: profileImage } : DEFAULT_AVATAR}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+            <TouchableOpacity style={styles.cameraBubble} activeOpacity={0.85} onPress={handlePickImage}>
               <MaterialIcons name="photo-camera" size={24} color="#8A5A00" />
             </TouchableOpacity>
           </View>
@@ -273,7 +340,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 8,
-    minHeight: 68,
+    minHeight: 60,
     borderRadius: 34,
   },
 });

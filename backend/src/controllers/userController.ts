@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { toPublicUploadPath } from '../middleware/upload';
+import { normalizePakistaniPhoneNumber } from '../utils/phone';
+
+// Use plain Request and cast `req.file` where needed to avoid conflicting global typedefs
 
 const normalizeEmail = (value: unknown) => {
   if (typeof value !== 'string') return undefined;
@@ -19,12 +22,24 @@ const resolveProfileImage = (file?: Express.Multer.File | null, fallback?: unkno
   return trimmed || undefined;
 };
 
+const normalizePhone = (value: unknown) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  return normalizePakistaniPhoneNumber(value);
+};
+
 export const createUser = async (req: Request, res: Response) => {
   try {
+    const phoneNumber = normalizePhone(req.body.phoneNumber);
+
+    if (req.body.phoneNumber && !phoneNumber) {
+      return res.status(400).json({ error: 'Enter a valid Pakistani mobile number' });
+    }
+
     const user = new User({
       ...req.body,
+      ...(phoneNumber ? { phoneNumber } : {}),
       email: normalizeEmail(req.body.email),
-      profileImage: resolveProfileImage(req.file as Express.Multer.File | undefined, req.body.profileImage || req.body.profileImageUrl || req.body.avatarUrl),
+      profileImage: resolveProfileImage((req as any).file as Express.Multer.File | undefined, req.body.profileImage || req.body.profileImageUrl || req.body.avatarUrl),
     });
     await user.save();
     res.status(201).json(user);
@@ -45,10 +60,17 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
+    const phoneNumber = normalizePhone(req.body.phoneNumber);
+
+    if (req.body.phoneNumber && !phoneNumber) {
+      return res.status(400).json({ error: 'Enter a valid Pakistani mobile number' });
+    }
+
     const updates = {
       ...req.body,
+      ...(phoneNumber ? { phoneNumber } : {}),
       email: normalizeEmail(req.body.email),
-      profileImage: resolveProfileImage(req.file as Express.Multer.File | undefined, req.body.profileImage || req.body.profileImageUrl || req.body.avatarUrl),
+      profileImage: resolveProfileImage((req as any).file as Express.Multer.File | undefined, req.body.profileImage || req.body.profileImageUrl || req.body.avatarUrl),
     };
 
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true });

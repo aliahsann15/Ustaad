@@ -46,10 +46,8 @@ export default function LoginScreen() {
         setAuthenticated(true, data.user?.phoneNumber || identifier, data.token || 'mock_token', data.user?._id || 'mock_id');
         router.replace('/(tabs)');
       }
-    } catch {
-      // Fallback local auth for testing
-      setAuthenticated(true, identifier, 'local_token', 'local_user_id');
-      router.replace('/(tabs)');
+    } catch (error) {
+      Alert.alert('Login failed', error instanceof Error ? error.message : 'Unable to sign in with this phone number.');
     } finally {
       setLoading(false);
     }

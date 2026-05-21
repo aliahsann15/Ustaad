@@ -119,6 +119,16 @@ export default function HomeScreen() {
     Animated.spring(micScale, { toValue: 1, useNativeDriver: true }).start();
   };
 
+  // Voice recording hook
+  // Use Android emulator host loopback by default; adjust `apiUrl` for device if needed
+  // 10.0.2.2 -> Android emulator, use local IP for real devices
+  const { isRecording, startRecording, stopRecordingAndTranscribe, transcription } = (require('../../hooks/useVoice') as any)({ apiUrl: 'http://10.0.2.2:5000/api/transcribe' });
+
+  // When transcription arrives, populate the input
+  if (transcription && transcription.length > 0 && transcription !== requestText) {
+    setRequestText(transcription);
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
@@ -221,11 +231,26 @@ export default function HomeScreen() {
                   style={[styles.micFab, micActive && styles.micFabActive, requestText.length > 0 && styles.micFabSend]}
                   onPressIn={handleMicPressIn}
                   onPressOut={handleMicPressOut}
-                  onPress={requestText.length > 0 ? handleSubmit : undefined}
+                  onPress={async () => {
+                    if (requestText.length > 0) {
+                      handleSubmit();
+                      return;
+                    }
+                    try {
+                      if (!isRecording) {
+                        await startRecording();
+                      } else {
+                        const text = await stopRecordingAndTranscribe();
+                        if (text) setRequestText(text);
+                      }
+                    } catch (err) {
+                      console.error('Voice error', err);
+                    }
+                  }}
                   activeOpacity={0.85}
                 >
                   <MaterialIcons
-                    name={requestText.length > 0 ? 'arrow-forward' : 'mic'}
+                    name={requestText.length > 0 ? 'arrow-forward' : (isRecording ? 'stop' : 'mic')}
                     size={28}
                     color={requestText.length > 0 ? theme.colors.primary : theme.colors.textPrimary}
                   />

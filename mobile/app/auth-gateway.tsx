@@ -37,7 +37,7 @@ export default function AuthGatewayScreen() {
         {/* Asymmetric Bento-Style Illustration Container */}
         <View style={styles.imageWrapper}>
           <Image
-            source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh5jGMwmyh1F0Hh0PI-5NbqobKmyFckwtM4R8wIg4SPS6FPlccx48WiwzTjDhXF7oMCm6ut7Dq4zPpIX9XIfd47zaYc3VKzfHIEa8Ldu-yfndpPCW_5q2GLdXJXhicp3UeZhfl1P45RIUPSoSEiBR7MwgP9GQaamzKRz8f7cw5OGM9LjS_HScR5wLrQ9P0ENdtzCjDpkKDD5sCtzBZhpQu0o0nL-xk3QEdito9Sj0xGJbr9izQsYMvlR3GNtZKLL995Sl4TKxyvcE' }}
+            source={require('../assets/images/user.png')}
             style={styles.illustrationImage}
             contentFit="cover"
             transition={300}

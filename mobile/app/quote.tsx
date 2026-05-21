@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet, ScrollView, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
@@ -13,7 +13,7 @@ import { useBookingStore } from '../store/useBookingStore';
 export default function QuoteScreen() {
   const router = useRouter();
   const matchedProvider = useBookingStore((state) => state.matchedProvider);
-  const priceBreakdown = useBookingStore((state) => state.priceBreakdown);
+  const otherProviders = useBookingStore((state) => state.otherProviders);
 
   const handleConfirm = () => {
     router.replace('/tracking');
@@ -25,84 +25,71 @@ export default function QuoteScreen() {
 
   return (
     <Page style={styles.container} scroll>
-      <Header title="Match Found" isSubScreen={true} />
+      <Header title="Provider Recommendation" isSubScreen={true} />
       <ScrollView contentContainerStyle={styles.content}>
-        
-        <View style={styles.header}>
-          <Ionicons name="checkmark-circle" size={60} color={theme.colors.success} />
+        <View style={styles.recommendationHeader}>
+          <Typography variant="caption" color={theme.colors.primary} weight="bold">Ustaad Expert Match</Typography>
+          <Typography variant="h2" style={{ marginTop: theme.spacing.sm }}>Provider Recommendation</Typography>
         </View>
 
         <Card style={styles.providerCard}>
-          <View style={styles.providerHeader}>
-            <View style={styles.avatarPlaceholder}>
-              <Typography variant="h2" color="#FFF">
-                {matchedProvider?.name
-                  ? matchedProvider.name
-                      .split(' ')
-                      .map((part) => part[0])
-                      .join('')
-                      .slice(0, 2)
-                      .toUpperCase()
-                  : 'AR'}
-              </Typography>
-            </View>
-            <View style={{ marginLeft: theme.spacing.md }}>
-              <Typography variant="h3">{matchedProvider?.name || 'Ali Raza'}</Typography>
-              <View style={styles.ratingRow}>
+          <View style={styles.ribbon}><Typography variant="caption" weight="bold" color="#fff">BEST MATCH</Typography></View>
+          <View style={styles.providerHeaderTop}>
+            <Image source={ matchedProvider?.avatar ? { uri: matchedProvider.avatar } : require('../assets/logomark.png') } style={styles.avatarBig} />
+            <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
+              <Typography variant="h2">{matchedProvider?.name || 'Asif Plumber'}</Typography>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
                 <Ionicons name="star" size={16} color={theme.colors.primary} />
-                <Typography variant="caption" weight="bold" style={{ marginLeft: 4 }}>
-                  {matchedProvider?.rating ? `${matchedProvider.rating.toFixed(1)} (${matchedProvider.reviewCount || 0} jobs)` : '4.9 (120 jobs)'}
-                </Typography>
+                <Typography variant="body" style={{ marginLeft: 8 }}>{matchedProvider?.rating ? `${matchedProvider.rating.toFixed(1)} (${matchedProvider.reviewCount || 0} reviews)` : '4.9 (124 reviews)'}</Typography>
               </View>
-            </View>
-            <View style={styles.badge}>
-              <Typography variant="caption" color="#FFF" weight="bold">Verified</Typography>
+              <Typography variant="body" style={{ marginTop: theme.spacing.sm, color: theme.colors.textSecondary }}>{matchedProvider?.specializationLevel ? `${matchedProvider.specializationLevel} • ${matchedProvider.yearsExperience || 8} Years Exp.` : 'Master Plumber • 8 Years Exp.'}</Typography>
             </View>
           </View>
-          
-          <View style={styles.divider} />
 
-          <View style={styles.detailsRow}>
-            <Ionicons name="location" size={20} color={theme.colors.textSecondary} />
-            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>
-              {matchedProvider?.distance != null ? `${matchedProvider.distance} km away (Est. 20 mins)` : '8.5 km away (Est. 20 mins)'}
-            </Typography>
-          </View>
-          <View style={styles.detailsRow}>
-            <Ionicons name="build" size={20} color={theme.colors.textSecondary} />
-            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>
-              {matchedProvider?.skills?.length ? matchedProvider.skills.join(', ') : 'AC Technician, Electrician'}
-            </Typography>
-          </View>
+          <View style={styles.divider} />
+          <Typography variant="body" style={{ fontStyle: 'italic', color: theme.colors.textSecondary }}>
+            {matchedProvider?.tagline || '"Highly skilled professional known for punctual service and high-quality pipe installations."'}
+          </Typography>
         </Card>
 
-        <Card style={styles.pricingCard}>
-          <Typography variant="h3" style={{ marginBottom: theme.spacing.md }}>Estimated Pricing</Typography>
-          
-          <View style={styles.priceRow}>
-            <Typography variant="body" color={theme.colors.textSecondary}>Base Visit Fee</Typography>
-            <Typography variant="body">Rs. {priceBreakdown?.visitFee ? Math.max(priceBreakdown.visitFee - (priceBreakdown.distanceCost || 0) - (priceBreakdown.urgencyAdjustment || 0), 0) : 500}</Typography>
-          </View>
-          <View style={styles.priceRow}>
-            <Typography variant="body" color={theme.colors.textSecondary}>Distance Surcharge (8.5km)</Typography>
-            <Typography variant="body">Rs. {priceBreakdown?.distanceCost || 200}</Typography>
-          </View>
-          <View style={styles.priceRow}>
-            <Typography variant="body" color={theme.colors.textSecondary}>Urgency Adjustment (High)</Typography>
-            <Typography variant="body">Rs. {priceBreakdown?.urgencyAdjustment || 300}</Typography>
-          </View>
-          
-          <View style={styles.divider} />
-          
-          <View style={styles.priceRow}>
-            <Typography variant="h2">Total Estimated</Typography>
-            <Typography variant="h2" color={theme.colors.primary}>Rs. {priceBreakdown?.totalEstimated || 1000}</Typography>
-          </View>
+        <Typography variant="h3" style={{ marginBottom: theme.spacing.sm }}>Nearby Professional</Typography>
+        <Card style={styles.bannerCard}>
+          <Image source={ require('../assets/logomark.png') } style={styles.bannerImage} resizeMode="cover" />
+          <View style={styles.bannerBadge}><Typography variant="caption" color="#fff">2.4 km away</Typography></View>
         </Card>
+
+        <Typography variant="h3" style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.sm }}>Alternative Providers</Typography>
+
+        <FlatList
+          data={otherProviders && otherProviders.length ? otherProviders : []}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <Card style={styles.altCard}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image source={ item.avatar ? { uri: item.avatar } : require('../assets/logomark.png') } style={styles.altAvatar} />
+                <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
+                  <Typography variant="h3">{item.name}</Typography>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                    <Ionicons name="star" size={14} color={theme.colors.primary} />
+                    <Typography variant="body" style={{ marginLeft: 8 }}>{item.rating ? `${item.rating.toFixed(1)} (${item.reviewCount || 0})` : '4.7 (89)'}</Typography>
+                  </View>
+                </View>
+                <TouchableOpacity style={styles.viewButton} onPress={() => router.push((`/provider/${item._id}`) as any)}>
+                  <Typography variant="body">View</Typography>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
+          ListEmptyComponent={() => (
+            <View style={{ paddingVertical: 8 }}>
+              <Typography variant="body" color={theme.colors.textSecondary}>No alternatives found.</Typography>
+            </View>
+          )}
+        />
 
         <View style={styles.actions}>
-          <Button title="Confirm Booking" onPress={handleConfirm} style={{ marginBottom: theme.spacing.md }} />
-          <Button title="Find Someone Else" variant="outline" onPress={handleCancel} />
+          <Button title="Schedule Service" onPress={handleConfirm} style={{ marginBottom: theme.spacing.md, backgroundColor: '#F6A300' }} />
+          <Button title="Cancel Recommendation" variant="outline" onPress={handleCancel} />
         </View>
 
       </ScrollView>
@@ -129,6 +116,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  recommendationHeader: {
+    marginBottom: theme.spacing.lg,
+  },
+  providerHeaderTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatarBig: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+  },
   avatarPlaceholder: {
     width: 60,
     height: 60,
@@ -151,6 +150,16 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
+  ribbon: {
+    position: 'absolute',
+    right: 0,
+    top: -6,
+    backgroundColor: '#6b3b00',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderTopRightRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
   divider: {
     height: 1,
     backgroundColor: theme.colors.border,
@@ -171,5 +180,46 @@ const styles = StyleSheet.create({
   },
   actions: {
     marginTop: theme.spacing.md,
+  }
+  ,
+  bannerCard: {
+    height: 120,
+    marginBottom: theme.spacing.md,
+    overflow: 'hidden',
+    borderRadius: 12,
+  },
+  bannerImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.8,
+  },
+  bannerBadge: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  altCard: {
+    marginBottom: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  altAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  viewButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   }
 });

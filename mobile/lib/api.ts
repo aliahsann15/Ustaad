@@ -8,14 +8,19 @@ type ApiOptions = {
 };
 
 async function apiRequest<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method || 'GET',
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
       ...(options.userId ? { 'x-user-id': options.userId } : {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: options.body
+      ? isFormData
+        ? options.body as FormData
+        : JSON.stringify(options.body)
+      : undefined,
   });
 
   const data = await response.json().catch(() => null);
@@ -84,13 +89,15 @@ export const getCurrentUser = (auth: { token?: string | null; userId?: string | 
 
 export const updateCurrentUser = (
   userId: string,
-  payload: {
-    name?: string;
-    email?: string;
-    phoneNumber?: string;
-    address?: string;
-    profileImage?: string;
-  },
+  payload:
+    | {
+        name?: string;
+        email?: string;
+        phoneNumber?: string;
+        address?: string;
+        profileImage?: string;
+      }
+    | FormData,
   auth: { token?: string | null; userId?: string | null },
 ) => {
   return apiRequest(`/users/${userId}`, {

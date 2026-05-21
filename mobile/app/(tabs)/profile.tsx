@@ -11,7 +11,7 @@ import { Card } from '../../components/Card';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getCurrentUser } from '../../lib/api';
 
-const PROFILE_IMAGE_URI = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80';
+const PROFILE_PLACEHOLDER = require('../../assets/images/user.png');
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -19,10 +19,11 @@ export default function ProfileScreen() {
   const token = useAuthStore((state) => state.token);
   const userId = useAuthStore((state) => state.userId);
   const logout = useAuthStore((state) => state.logout);
-  const [profileName, setProfileName] = useState('Ustaad Customer');
-  const [profileEmail, setProfileEmail] = useState('ahmed.khan@email.com');
-  const [profilePhone, setProfilePhone] = useState('+92 300 1234567');
-  const [profileAddress, setProfileAddress] = useState('Apartment 402, Al-Rehman Heights, Karachi');
+  const [profileName, setProfileName] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const memberLabel = 'Gold Member';
 
   useEffect(() => {
@@ -30,16 +31,11 @@ export default function ProfileScreen() {
 
     void getCurrentUser({ token, userId })
       .then((user: any) => {
-        setProfileName(user?.name || 'Ustaad Customer');
-        setProfileEmail(
-          user?.email ||
-            `${String(user?.name || 'ustaad customer')
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '.')
-              .replace(/^\.|\.$/g, '') || 'ustaad.customer'}@email.com`,
-        );
-        setProfilePhone(user?.phoneNumber || '+92 300 1234567');
-        setProfileAddress(user?.address || 'Apartment 402, Al-Rehman Heights, Karachi');
+        setProfileName(typeof user?.name === 'string' ? user.name.trim() : '');
+        setProfileEmail(typeof user?.email === 'string' ? user.email.trim() : '');
+        setProfilePhone(typeof user?.phoneNumber === 'string' ? user.phoneNumber.trim() : '');
+        setProfileAddress(typeof user?.address === 'string' ? user.address.trim() : '');
+        setProfileImage(typeof user?.profileImage === 'string' && user.profileImage.trim() ? user.profileImage.trim() : null);
       })
       .catch(() => {});
   }, [isAuthenticated, token, userId]);
@@ -62,7 +58,7 @@ export default function ProfileScreen() {
           <View style={styles.authenticatedContent}>
             <Card style={styles.profileHeroCard}>
               <View style={styles.avatarWrap}>
-                <Image source={{ uri: PROFILE_IMAGE_URI }} style={styles.avatarImage} contentFit="cover" />
+                <Image source={profileImage ? { uri: profileImage } : PROFILE_PLACEHOLDER} style={styles.avatarImage} contentFit="cover" />
 
                 <View style={styles.memberBadgeDot}>
                   <MaterialIcons name="verified" size={12} color="#FFFFFF" />
@@ -70,7 +66,7 @@ export default function ProfileScreen() {
               </View>
 
               <Typography variant="h3" color={theme.colors.textPrimary} align="center" style={styles.userName}>
-                {profileName}
+                {getDisplayValue('Full Name', profileName)}
               </Typography>
 
               <View style={styles.memberPill}>
@@ -109,7 +105,7 @@ export default function ProfileScreen() {
                   </View>
 
                   <Typography variant="h3" color={theme.colors.textPrimary} style={styles.addressValue}>
-                    {profileAddress}
+                    {getDisplayValue('Primary Address', profileAddress)}
                   </Typography>
                 </Card>
 
@@ -180,8 +176,8 @@ export default function ProfileScreen() {
               Please log in to manage your personal details, address, and support preferences.
             </Typography>
             <TouchableOpacity style={styles.loginButton} onPress={handleLoginPress} activeOpacity={0.86}>
-              <MaterialIcons name="login" size={20} color="#FFFFFF" />
-              <Typography variant="body" weight="bold" color="#FFFFFF" style={styles.loginButtonText}>
+              <MaterialIcons name="login" size={20} color="#000000" />
+              <Typography variant="body" weight="bold" color="#000000" style={styles.loginButtonText}>
                 Sign In
               </Typography>
             </TouchableOpacity>
@@ -382,6 +378,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: theme.spacing.lg,
+    marginTop: 200,
   },
   messageTitle: {
     fontFamily: theme.typography.fontFamilies.bold,
@@ -413,10 +410,16 @@ function InfoRow({ label, value }: { label: string; value: string }) {
         {label}
       </Typography>
       <Typography variant="body" style={styles.infoValue}>
-        {value}
+        {getDisplayValue(label, value)}
       </Typography>
     </View>
   );
+}
+
+function getDisplayValue(label: string, value: string) {
+  const trimmed = value.trim();
+  if (trimmed) return trimmed;
+  return `Add ${label.toLowerCase()} by editing profile`;
 }
 
 function SupportRow({

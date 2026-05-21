@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import AgentTrace from '../models/AgentTrace';
 import ServiceRequest from '../models/ServiceRequest';
 import Booking from '../models/Booking';
-import { searchProvidersTool, calculatePricingTool, contactProviderMockTool } from './tools';
+import { searchProvidersTool } from './tools';
 
 // Ensure you export GOOGLE_API_KEY or set it in .env, @google/genai automatically picks up GEMINI_API_KEY
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -80,41 +80,20 @@ export const runAgenticWorkflow = async (serviceRequestId: string, rawText: stri
     const bestProvider = searchResult.matchedProviders[0].provider;
     await logStep('TOOL_RESULT', `Matched Provider: ${bestProvider.name} (Score: ${searchResult.matchedProviders[0].matchScore})`, { providerId: bestProvider._id, name: bestProvider.name });
 
-    // STEP 3: Dynamic Pricing
-    await logStep('REASON', `I need to calculate the estimated price for provider ${bestProvider.name} based on their base rate of ${bestProvider.baseRatePerHour}.`);
-    
-    const priceBreakdown = calculatePricingTool(bestProvider.baseRatePerHour, intent.urgency, intent.complexity || 'basic', 5.0);
-    
-    await logStep('TOOL_RESULT', `Calculated Price: Total Estimated PKR ${priceBreakdown.totalEstimated}`, priceBreakdown);
+    // STEP 3: Prepare provider recommendations (top 4)
+    await logStep('REASON', `Preparing top provider recommendations for ${intent.serviceType}. Returning best match and three alternatives.`);
 
-    // STEP 4: WhatsApp Booking Simulation
-    await logStep('ACT', `I am sending a WhatsApp message to ${bestProvider.name} to confirm the job.`);
-    
-    const contactResult = await contactProviderMockTool(bestProvider._id.toString(), `Job: ${intent.serviceType} at ${intent.addressText}`);
-    
-    await logStep('TOOL_RESULT', `Provider Response: ${contactResult.message}`);
+    // Limit to top 4 providers
+    const topMatches = searchResult.matchedProviders.slice(0, 4);
+    const matchedProviders = topMatches.map(mp => ({ provider: mp.provider, matchScore: mp.matchScore }));
+    const recommendedProvider = matchedProviders[0]?.provider || null;
 
-    // STEP 5: Final Evaluation
-    if (contactResult.status === 'accepted') {
-      await logStep('EVALUATE', 'Provider accepted the job. Creating final booking record.');
-      
-      const booking = new Booking({
-        serviceRequestId,
-        userId,
-        providerId: bestProvider._id,
-        scheduledTime: new Date(Date.now() + 3600000), // Default 1 hr from now
-        priceBreakdown,
-        status: 'confirmed'
-      });
-      await booking.save();
+    await logStep('TOOL_RESULT', `Recommended provider: ${recommendedProvider?.name || 'none'}`, { recommendedProviderId: recommendedProvider?._id, count: matchedProviders.length });
 
-      await logStep('ACT', 'Booking confirmed and saved to database.', { bookingId: booking._id });
-      return { status: 'success', booking, intent };
+    // Update service request and return provider recommendations. Do NOT create bookings or expose pricing.
+    await ServiceRequest.findByIdAndUpdate(serviceRequestId, { status: 'matched', matchedProviders: matchedProviders.map(m => m.provider._id) });
 
-    } else {
-      await logStep('EVALUATE', 'Provider declined. (In a production agent, I would enter a loop to retry with the next best provider). Marking as failed for now.');
-      return { status: 'failed', reason: 'Provider declined' };
-    }
+    return { status: 'success', intent, recommendedProvider, otherProviders: matchedProviders.slice(1).map(m => m.provider), matchedProviders };
 
   } catch (error) {
     await logStep('EVALUATE', `Critical Error during workflow: ${(error as Error).message}`);

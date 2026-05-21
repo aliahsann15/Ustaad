@@ -12,6 +12,9 @@ interface Provider {
   specializationLevel?: 'basic' | 'intermediate' | 'expert';
   phoneNumber?: string;
   isVerified?: boolean;
+  avatar?: string;
+  tagline?: string;
+  yearsExperience?: number;
 }
 
 interface PriceBreakdown {
@@ -29,6 +32,7 @@ interface BookingState {
   agentLogs: string[];
   matchedProvider: Provider | null;
   priceBreakdown: PriceBreakdown | null;
+  otherProviders: Provider[];
   setRequest: (request: string) => void;
   setStatus: (status: BookingState['status']) => void;
   addAgentLog: (log: string) => void;
@@ -38,6 +42,7 @@ interface BookingState {
     bookingId?: string | null;
     provider?: Provider | null;
     priceBreakdown?: PriceBreakdown | null;
+    otherProviders?: Provider[] | null;
     status?: BookingState['status'];
   }) => void;
   clearBooking: () => void;
@@ -50,6 +55,7 @@ export const useBookingStore = create<BookingState>((set) => ({
   status: 'idle',
   agentLogs: [],
   matchedProvider: null,
+  otherProviders: [],
   priceBreakdown: null,
   setRequest: (request) => set({ currentRequest: request }),
   setStatus: (status) => set({ status }),
@@ -60,6 +66,7 @@ export const useBookingStore = create<BookingState>((set) => ({
     bookingId: payload.bookingId ?? state.bookingId,
     matchedProvider: payload.provider ?? state.matchedProvider,
     priceBreakdown: payload.priceBreakdown ?? state.priceBreakdown,
+    otherProviders: payload.otherProviders ?? state.otherProviders,
     status: payload.status ?? state.status,
   })),
   clearBooking: () => set({
