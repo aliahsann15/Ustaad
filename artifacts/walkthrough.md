@@ -7,7 +7,7 @@ We have successfully integrated a beautiful, premium, and unified header system 
 ## 🚀 Accomplishments
 
 ### 1. Custom Floating Header Component
-We created a reusable, high-performance [Header](file:///Users/aliahsann15/General/Fixit/mobile/components/Header.tsx) component that provides:
+We created a reusable, high-performance [Header](file:///Users/aliahsann15/General/ustaad/mobile/components/Header.tsx) component that provides:
 - **Theme Consistency**: Background color matching the Charcoal Black (`#1C1C1E`) layout system.
 - **Premium Floating Aesthetics**: 
   - Reduced border radius (`borderRadius: 16`) applied to **all four corners**.
@@ -19,15 +19,15 @@ We created a reusable, high-performance [Header](file:///Users/aliahsann15/Gener
 
 ### 2. Full Application Integration
 The custom Header has been seamlessly integrated into all main screens and sub-screens:
-- [Home (index.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/index.tsx): Integrated standard header and converted `SafeAreaView` to standard `View` for full status bar coloring.
-- [History (activity.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/activity.tsx): Added "History" header and streamlined layout.
-- [Profile (profile.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/profile.tsx): Added "Profile" header.
-- [More (more.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/more.tsx): Added "More" header.
-- [Welcome/Auth (auth.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/auth.tsx): Added "Welcome" header (no back button, as it's the gateway).
-- [Matching (matching.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/matching.tsx): Added "Matching Ustaad" header with sub-screen back chevron enabled.
-- [Quote Confirmation (quote.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/quote.tsx): Added "Match Found" header with sub-screen back chevron enabled.
-- [Live Tracking (tracking.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/tracking.tsx): Added "Live Tracking" header with sub-screen back chevron enabled and perfectly adjusted floating status card layout.
-- [Modal (modal.tsx)](file:///Users/aliahsann15/General/Fixit/mobile/app/modal.tsx): Added "Modal Info" header with back chevron enabled.
+- [Home (index.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/index.tsx): Integrated standard header and converted `SafeAreaView` to standard `View` for full status bar coloring.
+- [History (activity.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/activity.tsx): Added "History" header and streamlined layout.
+- [Profile (profile.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/profile.tsx): Added "Profile" header.
+- [More (more.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/more.tsx): Added "More" header.
+- [Welcome/Auth (auth.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/auth.tsx): Added "Welcome" header (no back button, as it's the gateway).
+- [Matching (matching.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/matching.tsx): Added "Matching Ustaad" header with sub-screen back chevron enabled.
+- [Quote Confirmation (quote.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/quote.tsx): Added "Match Found" header with sub-screen back chevron enabled.
+- [Live Tracking (tracking.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/tracking.tsx): Added "Live Tracking" header with sub-screen back chevron enabled and perfectly adjusted floating status card layout.
+- [Modal (modal.tsx)](file:///Users/aliahsann15/General/ustaad/mobile/app/modal.tsx): Added "Modal Info" header with back chevron enabled.
 
 ---
 

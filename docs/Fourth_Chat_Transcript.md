@@ -35,7 +35,7 @@ The following artifacts have been re-established in this session:
 
 I have created a clean, human-readable markdown file of your last chat logs at the root of your project folder. 
 
-You can access it here: **[last_chat_logs.md](file:///Users/aliahsann15/General/Fixit/last_chat_logs.md)**.
+You can access it here: **[last_chat_logs.md](file:///Users/aliahsann15/General/ustaad/last_chat_logs.md)**.
 
 ### What is Included:
 *   A chronological transcript of the previous session where we designed the bottom navigation.
@@ -59,7 +59,7 @@ I have successfully completed your request to design and implement a premium, un
 Here is a summary of the accomplishments and implementation details:
 
 ### 1. Created the Custom Header Component
-We developed a highly reusable, high-performance [Header](file:///Users/aliahsann15/General/Fixit/mobile/components/Header.tsx) component that provides:
+We developed a highly reusable, high-performance [Header](file:///Users/aliahsann15/General/ustaad/mobile/components/Header.tsx) component that provides:
 *   **Theme Integration**: Designed with our digital Charcoal Black (`#1C1C1E`) background, establishing a premium look.
 *   **Rounded Borders**: Implemented beautiful bottom corners (`borderBottomLeftRadius: 24`, `borderBottomRightRadius: 24`) matching the premium tab bar design.
 *   **Dynamic Back Navigation**: Sub-screens display a custom-designed, semi-transparent white circular back-chevron button before the title, while main tabs present the clean title.
@@ -145,7 +145,7 @@ I have successfully resolved this layout issue!
 The bottom tab navigation bar is absolutely positioned (`position: 'absolute', bottom: 0, height: 85`). Because it overlays on top of the screen content, the bottom `85px` of the home screen was being completely covered. The suggested services' pills, which are rendered below the input field, were sitting directly inside this covered zone, making them invisible.
 
 ### 🛠️ The Fix implemented:
-*   Added `paddingBottom: 110` to the home screen's main content layout in [index.tsx](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/index.tsx).
+*   Added `paddingBottom: 110` to the home screen's main content layout in [index.tsx](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/index.tsx).
 *   This shifts the active layout container up by `110px` (clearing the `85px` tab bar height and leaving a perfectly balanced `25px` breathing gap).
 
 The input field now floats comfortably above the bottom navigation bar, and the suggested service pills are **fully visible and clickable** directly under the input container! Let me know how it looks on your device now.
@@ -168,7 +168,7 @@ I have successfully applied all three requested visual refinements!
 
 ### 🎨 Refinements Implemented:
 1.  **Aligned Screen and Header Padding**:
-    *   Updated the body's horizontal padding (`paddingHorizontal` inside [index.tsx](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/index.tsx)) to exactly `16px`. This creates a perfectly unified vertical alignment between the floating header card and the main page content on both sides!
+    *   Updated the body's horizontal padding (`paddingHorizontal` inside [index.tsx](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/index.tsx)) to exactly `16px`. This creates a perfectly unified vertical alignment between the floating header card and the main page content on both sides!
 2.  **Extracted Mic Button Outside the Input Field**:
     *   Moved the microphone/submit action button (`fab`) out of the white text input container.
     *   Placed it cleanly on the **right side** of the input box.
@@ -189,7 +189,7 @@ I have successfully applied all three requested visual refinements!
 I have successfully implemented your request to configure the text input field's rows!
 
 ### 🛠️ Changes Implemented:
-1.  **1-Row Height by Default**: Removed the `minHeight: 50` constraint from [index.tsx](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/index.tsx) and adjusted vertical paddings to `8px` (iOS) and `4px` (Android). This allows the text input to collapse naturally to **exactly 1 row** by default when empty or containing single-line inputs.
+1.  **1-Row Height by Default**: Removed the `minHeight: 50` constraint from [index.tsx](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/index.tsx) and adjusted vertical paddings to `8px` (iOS) and `4px` (Android). This allows the text input to collapse naturally to **exactly 1 row** by default when empty or containing single-line inputs.
 2.  **5-Row Height Maximum Limit**: Set `maxHeight: 120` inside `styles.input`. As the user types more lines of text, the input box grows dynamically and automatically stops growing after **5 rows**, enabling clean in-box vertical scrolling for any additional text.
 3.  **Attribute Integration**: Added `numberOfLines={1}` and `multiline={true}` properties to the `TextInput` to ensure perfect default layout initializing.
 
@@ -251,7 +251,7 @@ I have successfully implemented both refinements to make the UI and UX incredibl
 
 ### 🛠️ What was changed:
 1.  **Tighter Input-to-Button Spacing**:
-    *   Reduced the gap between the `TextInput` card and the outer microphone/submit button (`styles.fab`) from `12px` to `8px` in [index.tsx](file:///Users/aliahsann15/General/Fixit/mobile/app/(tabs)/index.tsx). This creates an extremely cohesive and balanced visual alignment.
+    *   Reduced the gap between the `TextInput` card and the outer microphone/submit button (`styles.fab`) from `12px` to `8px` in [index.tsx](file:///Users/aliahsann15/General/ustaad/mobile/app/(tabs)/index.tsx). This creates an extremely cohesive and balanced visual alignment.
 2.  **Tap Outside to Dismiss Keyboard / Unfocus**:
     *   Wrapped the entire content container inside a native `TouchableWithoutFeedback` configured with `onPress={Keyboard.dismiss}` and `accessible={false}`.
     *   Now, touching **anywhere on the screen background** (outside the active input field) will instantly dismiss the keyboard, unfocus the text field, and clean up the viewport automatically—providing a high-end mobile user experience!
