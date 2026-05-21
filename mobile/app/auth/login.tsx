@@ -17,10 +17,16 @@ import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Page } from '../../components/Page';
+import { loginMock } from '../../lib/api';
 
 export default function LoginScreen() {
   const router = useRouter();
   const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
+
+  type LoginResponse = {
+    user?: { phoneNumber?: string; _id?: string };
+    token?: string;
+  };
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -34,21 +40,11 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // Mock / Real API Integration
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${apiUrl}/auth/login-mock`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: identifier }),
-      });
+      const data = (await loginMock({ phoneNumber: identifier, password })) as LoginResponse;
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setAuthenticated(true, identifier, data.token || 'mock_token', data.user?._id || 'mock_id');
+      if (data) {
+        setAuthenticated(true, data.user?.phoneNumber || identifier, data.token || 'mock_token', data.user?._id || 'mock_id');
         router.replace('/(tabs)');
-      } else {
-        Alert.alert('Auth Error', data.error || 'Login failed. Please check your credentials.');
       }
     } catch {
       // Fallback local auth for testing

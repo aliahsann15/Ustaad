@@ -1,0 +1,23 @@
+# Task List: AI Service Orchestrator
+
+- `[x]` Phase 1: Foundation & Data Modeling
+  - `[x]` Export the plan to the root directory
+  - `[x]` Set up React Native (Expo) project structure
+  - `[x]` Set up Node.js (Express) backend
+  - `[x]` Design MongoDB schema (Users, Providers, ServiceRequests, Bookings)
+  - `[x]` Generate and seed mock provider data
+- `[x]` Phase 2: Core AI Agent Orchestrator
+  - `[x]` Implement Agent loop in Node.js
+  - `[x]` Intent Extraction logic
+  - `[x]` Matching Algorithm logic
+  - `[x]` Dynamic Pricing logic
+- `[/]` Phase 3: Mobile App UI & State
+  - `[x]` Develop UI screens (Home, Matching, Tracking, Feedback)
+  - `[x]` Implement premium unified headers with rounded bottom borders and back chevrons
+  - `[x]` Integrate frontend with backend API
+- `[ ]` Phase 4: Workflow Simulation & Edge Cases
+  - `[ ]` Booking lifecycle state machine
+  - `[ ]` Implement stress-test scenarios
+- `[ ]` Phase 5: Polish & Deliverables Generation
+  - `[ ]` Capture reasoning traces
+  - `[ ]` Finalize README

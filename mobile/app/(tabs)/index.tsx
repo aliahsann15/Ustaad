@@ -20,6 +20,8 @@ import { Typography } from '../../components/Typography';
 import { Header } from '../../components/Header';
 import { Page } from '../../components/Page';
 import { useBookingStore } from '../../store/useBookingStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { submitServiceRequest } from '../../lib/api';
 
 const SERVICE_SUGGESTIONS = [
   { label: 'Plumber', query: 'I need a Plumber' },
@@ -38,10 +40,67 @@ export default function HomeScreen() {
   const [selectedChip, setSelectedChip] = useState<string | null>(null);
   const micScale = useRef(new Animated.Value(1)).current;
   const setRequest = useBookingStore((state) => state.setRequest);
+  const setStatus = useBookingStore((state) => state.setStatus);
+  const addAgentLog = useBookingStore((state) => state.addAgentLog);
+  const setBackendResult = useBookingStore((state) => state.setBackendResult);
+  const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
+
+  const normalizeProvider = (provider: any) => {
+    if (!provider) return null;
+
+    const coordinates = provider.location?.coordinates;
+    const location = Array.isArray(coordinates) && coordinates.length === 2
+      ? { lat: coordinates[1], lng: coordinates[0] }
+      : provider.location && typeof provider.location.lat === 'number' && typeof provider.location.lng === 'number'
+        ? provider.location
+        : { lat: 0, lng: 0 };
+
+    return {
+      _id: String(provider._id || provider.id || 'provider'),
+      name: provider.name || 'Matched Provider',
+      skills: Array.isArray(provider.skills) ? provider.skills : [],
+      location,
+      distance: provider.distance,
+      priceEstimate: provider.priceEstimate,
+      rating: provider.rating,
+      reviewCount: provider.reviewCount,
+      specializationLevel: provider.specializationLevel,
+      phoneNumber: provider.phoneNumber,
+      isVerified: provider.isVerified,
+    };
+  };
 
   const handleSubmit = () => {
-    if (requestText.trim().length === 0) return;
-    setRequest(requestText);
+    const trimmedRequest = requestText.trim();
+    if (trimmedRequest.length === 0) return;
+
+    setRequest(trimmedRequest);
+    setStatus('matching');
+
+    void submitServiceRequest(
+      { rawText: trimmedRequest, userId },
+      { token, userId }
+    )
+      .then((data: any) => {
+        const provider = normalizeProvider(data?.matchedProvider || data?.booking?.providerId || data?.agentResult?.booking?.providerId);
+
+        setBackendResult({
+          serviceRequestId: data?.serviceRequest?._id || null,
+          bookingId: data?.booking?._id || data?.agentResult?.booking?._id || null,
+          provider,
+          priceBreakdown: data?.priceBreakdown || data?.booking?.priceBreakdown || data?.agentResult?.booking?.priceBreakdown || null,
+          status: data?.booking || data?.agentResult?.booking ? 'matched' : 'matching',
+        });
+
+        if (provider?.name) {
+          addAgentLog(`Matched provider: ${provider.name}`);
+        }
+      })
+      .catch((error) => {
+        addAgentLog(`Backend request failed: ${(error as Error).message}`);
+      });
+
     router.push('/matching');
   };
 

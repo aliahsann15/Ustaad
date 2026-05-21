@@ -18,6 +18,7 @@ import { Typography } from '../../components/Typography';
 import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
 import { Page } from '../../components/Page';
+import { forgotPasswordMock } from '../../lib/api';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -34,16 +35,14 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
 
     try {
-      // Mock code sending flow
-      setTimeout(() => {
-        setLoading(false);
-        setCodeSent(true);
-        Alert.alert(
-          'Verification Code Sent',
-          `A password reset code has been sent to ${identifier}.`,
-          [{ text: 'OK', onPress: () => router.push('/auth/login') }]
-        );
-      }, 1500);
+      const data = await forgotPasswordMock({ identifier });
+      setLoading(false);
+      setCodeSent(true);
+      Alert.alert(
+        'Verification Code Sent',
+        data.message || `A password reset code has been sent to ${identifier}.`,
+        [{ text: 'OK', onPress: () => router.push('/auth/login') }]
+      );
     } catch (error) {
       Alert.alert('Error', 'Failed to send recovery code. Please try again.');
       setLoading(false);

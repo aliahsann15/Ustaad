@@ -18,6 +18,7 @@ import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
 import { Page } from '../../components/Page';
 import { useAuthStore } from '../../store/useAuthStore';
+import { signupMock } from '../../lib/api';
 
 export default function SignupScreen() {
   const router = useRouter();
@@ -41,11 +42,17 @@ export default function SignupScreen() {
     setLoading(true);
 
     try {
-      // Mock signup flow -> routes user directly as authenticated
+      const data = await signupMock({
+        fullName,
+        phoneNumber: phone,
+        password,
+        languagePreference: 'ur-Latn',
+      });
+
+      setAuthenticated(true, data.user?.phoneNumber || phone, data.token || 'signup_mock_token', data.user?._id || 'signup_mock_user');
       setTimeout(() => {
-        setAuthenticated(true, phone, 'signup_mock_token', 'signup_mock_user');
         router.replace('/(tabs)');
-      }, 1000);
+      }, 150);
     } catch (error) {
       Alert.alert('Registration Error', 'An error occurred during registration. Please try again.');
       setLoading(false);

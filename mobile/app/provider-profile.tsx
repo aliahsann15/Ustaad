@@ -81,6 +81,40 @@ export default function ProviderProfileScreen() {
           </View>
         </View>
 
+        <View style={styles.contactCard}>
+          <Typography variant="h3" weight="bold" style={styles.cardTitle}>
+            Contact Information
+          </Typography>
+
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconWrap}>
+              <MaterialIcons name="call" size={22} color="#A16207" />
+            </View>
+            <View style={styles.contactTextWrap}>
+              <Typography variant="caption" color={theme.colors.textSecondary} style={styles.contactLabel}>
+                Phone Number
+              </Typography>
+              <Typography variant="body" weight="bold" style={styles.contactValue}>
+                +92 300 9876543
+              </Typography>
+            </View>
+          </View>
+
+          <View style={styles.contactRow}>
+            <View style={styles.contactIconWrap}>
+              <MaterialIcons name="email" size={22} color="#A16207" />
+            </View>
+            <View style={styles.contactTextWrap}>
+              <Typography variant="caption" color={theme.colors.textSecondary} style={styles.contactLabel}>
+                Email Address
+              </Typography>
+              <Typography variant="body" weight="bold" style={styles.contactValue}>
+                asif.plumber@ustaad.com
+              </Typography>
+            </View>
+          </View>
+        </View>
+
         <View style={styles.aboutCard}>
           <Typography variant="h3" weight="bold" style={styles.aboutTitle}>
             About Asif
@@ -89,6 +123,15 @@ export default function ProviderProfileScreen() {
           <Typography variant="body" color={theme.colors.textSecondary} style={styles.aboutBody}>
             With over 12 years of experience in high-end residential plumbing, I provide reliable, quick-response services across the metropolitan area. Committed to quality parts and transparent pricing.
           </Typography>
+        </View>
+
+        <View style={styles.footerActionWrap}>
+          <View style={styles.bookButton}>
+            <MaterialIcons name="event" size={22} color="#5F3F00" />
+            <Typography variant="body" weight="bold" style={styles.bookButtonText}>
+              Book Now
+            </Typography>
+          </View>
         </View>
       </View>
     </Page>
@@ -106,28 +149,28 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: theme.spacing.xl,
-    paddingBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.lg,
   },
   profileCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 32,
     borderWidth: 1,
-    borderColor: '#E7EDF4',
+    borderColor: '#DDE7F1',
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.lg,
+    paddingTop: 18,
     paddingBottom: theme.spacing.md,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.06,
-    shadowRadius: 14,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 4,
   },
   avatarWrap: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 4,
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    borderWidth: 5,
     borderColor: '#F59E0B',
     overflow: 'visible',
     marginBottom: theme.spacing.md,
@@ -140,14 +183,14 @@ const styles = StyleSheet.create({
   },
   badgeBubble: {
     position: 'absolute',
-    right: 4,
-    bottom: 4,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    right: 2,
+    bottom: 2,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#FBBF24',
-    borderWidth: 2,
-    borderColor: theme.colors.card,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -165,7 +208,7 @@ const styles = StyleSheet.create({
   divider: {
     width: '100%',
     height: 1,
-    backgroundColor: '#EEF2F7',
+    backgroundColor: '#E7EDF4',
     marginVertical: theme.spacing.md,
   },
   statsRow: {
@@ -176,8 +219,8 @@ const styles = StyleSheet.create({
   statItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
-    paddingVertical: 2,
+    gap: 5,
+    paddingVertical: 4,
   },
   statValueRow: {
     flexDirection: 'row',
@@ -186,7 +229,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     color: theme.colors.textPrimary,
-    fontSize: 18,
+    fontSize: 19,
   },
   statLabel: {
     fontSize: 12,
@@ -201,8 +244,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: theme.colors.textPrimary,
-    fontSize: 21,
-    lineHeight: 27,
+    fontSize: 22,
+    lineHeight: 28,
   },
   chipWrap: {
     flexDirection: 'row',
@@ -211,23 +254,67 @@ const styles = StyleSheet.create({
   },
   chip: {
     minHeight: 40,
-    paddingHorizontal: 14,
+    paddingHorizontal: 18,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#D8C5AE',
-    backgroundColor: '#F4F1ED',
+    borderColor: '#D9BE97',
+    backgroundColor: '#F2F2F2',
     alignItems: 'center',
     justifyContent: 'center',
   },
   chipText: {
-    color: '#2F2F2F',
-    fontSize: 14,
+    color: '#2D2D2D',
+    fontSize: 15,
   },
-  aboutCard: {
-    backgroundColor: theme.colors.card,
+  contactCard: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E7EDF4',
+    borderColor: '#DDE7F1',
+    padding: theme.spacing.lg,
+    gap: theme.spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  cardTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: 21,
+    lineHeight: 27,
+  },
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  contactIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFF3E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contactTextWrap: {
+    flex: 1,
+  },
+  contactLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  contactValue: {
+    color: theme.colors.textPrimary,
+    fontSize: 15,
+    lineHeight: 21,
+    marginTop: 1,
+  },
+  aboutCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#DDE7F1',
     padding: theme.spacing.lg,
     gap: theme.spacing.sm,
     shadowColor: '#000',
@@ -244,5 +331,27 @@ const styles = StyleSheet.create({
   aboutBody: {
     fontSize: 15,
     lineHeight: 23,
+  },
+  footerActionWrap: {
+    paddingTop: theme.spacing.xs,
+    paddingBottom: theme.spacing.sm,
+  },
+  bookButton: {
+    minHeight: 58,
+    borderRadius: 29,
+    backgroundColor: '#F7A810',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    shadowColor: '#D38A00',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  bookButtonText: {
+    color: '#5F3F00',
+    fontSize: 16,
   },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../constants/theme';
@@ -8,9 +8,12 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Header } from '../components/Header';
 import { Page } from '../components/Page';
+import { useBookingStore } from '../store/useBookingStore';
 
 export default function QuoteScreen() {
   const router = useRouter();
+  const matchedProvider = useBookingStore((state) => state.matchedProvider);
+  const priceBreakdown = useBookingStore((state) => state.priceBreakdown);
 
   const handleConfirm = () => {
     router.replace('/tracking');
@@ -32,13 +35,24 @@ export default function QuoteScreen() {
         <Card style={styles.providerCard}>
           <View style={styles.providerHeader}>
             <View style={styles.avatarPlaceholder}>
-              <Typography variant="h2" color="#FFF">AR</Typography>
+              <Typography variant="h2" color="#FFF">
+                {matchedProvider?.name
+                  ? matchedProvider.name
+                      .split(' ')
+                      .map((part) => part[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase()
+                  : 'AR'}
+              </Typography>
             </View>
             <View style={{ marginLeft: theme.spacing.md }}>
-              <Typography variant="h3">Ali Raza</Typography>
+              <Typography variant="h3">{matchedProvider?.name || 'Ali Raza'}</Typography>
               <View style={styles.ratingRow}>
                 <Ionicons name="star" size={16} color={theme.colors.primary} />
-                <Typography variant="caption" weight="bold" style={{ marginLeft: 4 }}>4.9 (120 jobs)</Typography>
+                <Typography variant="caption" weight="bold" style={{ marginLeft: 4 }}>
+                  {matchedProvider?.rating ? `${matchedProvider.rating.toFixed(1)} (${matchedProvider.reviewCount || 0} jobs)` : '4.9 (120 jobs)'}
+                </Typography>
               </View>
             </View>
             <View style={styles.badge}>
@@ -50,11 +64,15 @@ export default function QuoteScreen() {
 
           <View style={styles.detailsRow}>
             <Ionicons name="location" size={20} color={theme.colors.textSecondary} />
-            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>8.5 km away (Est. 20 mins)</Typography>
+            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>
+              {matchedProvider?.distance != null ? `${matchedProvider.distance} km away (Est. 20 mins)` : '8.5 km away (Est. 20 mins)'}
+            </Typography>
           </View>
           <View style={styles.detailsRow}>
             <Ionicons name="build" size={20} color={theme.colors.textSecondary} />
-            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>AC Technician, Electrician</Typography>
+            <Typography variant="body" style={{ marginLeft: theme.spacing.sm }}>
+              {matchedProvider?.skills?.length ? matchedProvider.skills.join(', ') : 'AC Technician, Electrician'}
+            </Typography>
           </View>
         </Card>
 
@@ -63,22 +81,22 @@ export default function QuoteScreen() {
           
           <View style={styles.priceRow}>
             <Typography variant="body" color={theme.colors.textSecondary}>Base Visit Fee</Typography>
-            <Typography variant="body">Rs. 500</Typography>
+            <Typography variant="body">Rs. {priceBreakdown?.visitFee ? Math.max(priceBreakdown.visitFee - (priceBreakdown.distanceCost || 0) - (priceBreakdown.urgencyAdjustment || 0), 0) : 500}</Typography>
           </View>
           <View style={styles.priceRow}>
             <Typography variant="body" color={theme.colors.textSecondary}>Distance Surcharge (8.5km)</Typography>
-            <Typography variant="body">Rs. 200</Typography>
+            <Typography variant="body">Rs. {priceBreakdown?.distanceCost || 200}</Typography>
           </View>
           <View style={styles.priceRow}>
             <Typography variant="body" color={theme.colors.textSecondary}>Urgency Adjustment (High)</Typography>
-            <Typography variant="body">Rs. 300</Typography>
+            <Typography variant="body">Rs. {priceBreakdown?.urgencyAdjustment || 300}</Typography>
           </View>
           
           <View style={styles.divider} />
           
           <View style={styles.priceRow}>
             <Typography variant="h2">Total Estimated</Typography>
-            <Typography variant="h2" color={theme.colors.primary}>Rs. 1000</Typography>
+            <Typography variant="h2" color={theme.colors.primary}>Rs. {priceBreakdown?.totalEstimated || 1000}</Typography>
           </View>
         </Card>
 

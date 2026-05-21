@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,6 +12,7 @@ import { Button } from '../../components/Button';
 import { Header } from '../../components/Header';
 import { Page } from '../../components/Page';
 import { useAuthStore } from '../../store/useAuthStore';
+import { getMyBookings } from '../../lib/api';
 
 // ── Types ──────────────────────────────────────────────────────
 type BookingStatus = 'completed' | 'cancelled' | 'in_progress';
@@ -146,12 +147,66 @@ function BookingCard({ item, onPress }: { item: Booking; onPress: () => void }) 
 export default function ActivityScreen() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
   const [activeFilter, setActiveFilter] = useState<string>('all');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const filteredBookings =
-    activeFilter === 'all'
-      ? MOCK_BOOKINGS
-      : MOCK_BOOKINGS.filter((b) => b.status === activeFilter);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setBookings([]);
+      return;
+    }
+
+    setLoading(true);
+    void getMyBookings({ token, userId })
+      .then((data) => {
+        const bookingsData = data as any[];
+        const mapped = (bookingsData || []).map((booking) => {
+          const provider = booking.providerId || {};
+          const serviceRequest = booking.serviceRequestId || {};
+          const serviceType = serviceRequest?.extractedIntent?.serviceType || provider?.skills?.[0] || 'Service Request';
+          const createdAt = booking.createdAt ? new Date(booking.createdAt) : new Date();
+          const statusMap: Record<string, BookingStatus> = {
+            requested: 'in_progress',
+            confirmed: 'in_progress',
+            en_route: 'in_progress',
+            in_progress: 'in_progress',
+            completed: 'completed',
+            cancelled: 'cancelled',
+            disputed: 'cancelled',
+          };
+
+          return {
+            id: String(booking._id),
+            service: serviceType,
+            date: createdAt.toLocaleString('en-PK', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            }),
+            status: statusMap[booking.status] || 'in_progress',
+            provider: provider?.name || 'Matched Provider',
+            price: `Rs. ${booking.priceBreakdown?.totalEstimated || 0}`,
+            icon: (serviceType.toLowerCase().includes('ac') ? 'ac-unit' : serviceType.toLowerCase().includes('clean') ? 'cleaning-services' : serviceType.toLowerCase().includes('electric') ? 'electrical-services' : 'plumbing') as keyof typeof MaterialIcons.glyphMap,
+            iconColor: '#855300',
+            iconBg: 'rgba(245,158,11,0.10)',
+          };
+        });
+
+        setBookings(mapped.length > 0 ? mapped : MOCK_BOOKINGS);
+      })
+      .catch(() => setBookings(MOCK_BOOKINGS))
+      .finally(() => setLoading(false));
+  }, [isAuthenticated, token, userId]);
+
+  const filteredBookings = useMemo(
+    () => activeFilter === 'all' ? bookings : bookings.filter((b) => b.status === activeFilter),
+    [activeFilter, bookings]
+  );
 
   if (!isAuthenticated) {
     return (
@@ -211,7 +266,11 @@ export default function ActivityScreen() {
         </ScrollView>
 
         {/* ─── Booking Cards ─── */}
-        {filteredBookings.length > 0 ? (
+        {loading ? (
+          <View style={styles.emptyState}>
+            <Typography style={styles.emptyTitle}>Loading history...</Typography>
+          </View>
+        ) : filteredBookings.length > 0 ? (
           <View style={styles.cardList}>
             {filteredBookings.map((item) => (
               <BookingCard

@@ -10,9 +10,11 @@ import { Button } from '../components/Button';
 import { Header } from '../components/Header';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Page } from '../components/Page';
+import { useBookingStore } from '../store/useBookingStore';
 
 export default function TrackingScreen() {
   const router = useRouter();
+  const matchedProvider = useBookingStore((state) => state.matchedProvider);
 
   // Mock coordinates for Islamabad, Pakistan
   const customerRegion = {
@@ -23,8 +25,8 @@ export default function TrackingScreen() {
   };
   
   const providerLocation = {
-    latitude: 33.6700,
-    longitude: 73.0300,
+    latitude: matchedProvider?.location?.lat || 33.6700,
+    longitude: matchedProvider?.location?.lng || 73.0300,
   };
 
   const insets = useSafeAreaInsets();
@@ -77,11 +79,17 @@ export default function TrackingScreen() {
           
           <View style={styles.providerRow}>
             <View style={styles.avatar}>
-              <Typography variant="h3" color="#FFF">AR</Typography>
+              <Typography variant="h3" color="#FFF">
+                {matchedProvider?.name
+                  ? matchedProvider.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase()
+                  : 'AR'}
+              </Typography>
             </View>
             <View style={{ flex: 1, marginLeft: theme.spacing.md }}>
-              <Typography variant="h3">Ali Raza</Typography>
-              <Typography variant="caption">AC Technician • Toyota Corolla (AB-1234)</Typography>
+              <Typography variant="h3">{matchedProvider?.name || 'Ali Raza'}</Typography>
+              <Typography variant="caption">
+                {matchedProvider?.skills?.length ? `${matchedProvider.skills.join(' • ')}` : 'AC Technician • Toyota Corolla (AB-1234)'}
+              </Typography>
             </View>
           </View>
 

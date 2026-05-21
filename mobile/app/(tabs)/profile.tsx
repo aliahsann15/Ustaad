@@ -1,91 +1,165 @@
-// import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Image } from 'expo-image';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { theme } from '../../constants/theme';
 import { Typography } from '../../components/Typography';
 import { Header } from '../../components/Header';
 import { Page } from '../../components/Page';
-import { Button } from '../../components/Button';
-
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Card } from '../../components/Card';
 import { useAuthStore } from '../../store/useAuthStore';
+import { getCurrentUser } from '../../lib/api';
+
+const PROFILE_IMAGE_URI = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const phoneNumber = useAuthStore((state) => state.phoneNumber);
+  const token = useAuthStore((state) => state.token);
+  const userId = useAuthStore((state) => state.userId);
   const logout = useAuthStore((state) => state.logout);
+  const [profileName, setProfileName] = useState('Ustaad Customer');
+  const [profileEmail, setProfileEmail] = useState('ahmed.khan@email.com');
+  const [profilePhone, setProfilePhone] = useState('+92 300 1234567');
+  const [profileAddress, setProfileAddress] = useState('Apartment 402, Al-Rehman Heights, Karachi');
+  const memberLabel = 'Gold Member';
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    void getCurrentUser({ token, userId })
+      .then((user: any) => {
+        setProfileName(user?.name || 'Ustaad Customer');
+        setProfileEmail(
+          user?.email ||
+            `${String(user?.name || 'ustaad customer')
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '.')
+              .replace(/^\.|\.$/g, '') || 'ustaad.customer'}@email.com`,
+        );
+        setProfilePhone(user?.phoneNumber || '+92 300 1234567');
+        setProfileAddress(user?.address || 'Apartment 402, Al-Rehman Heights, Karachi');
+      })
+      .catch(() => {});
+  }, [isAuthenticated, token, userId]);
 
   const handleLoginPress = () => {
     router.push('/auth/login');
   };
 
   const handleLogoutPress = () => {
-  logout();
-  router.replace('/auth-gateway');
-};
-
-  // Keep-awake intentionally disabled to avoid native runtime issues.
-
-  // Duplicate login handler removed – the correct handler is defined earlier.
+    logout();
+    router.replace('/auth-gateway');
+  };
 
 
   return (
-    <Page style={styles.container}>
+    <Page style={styles.container} scroll contentContainerStyle={styles.pageContent}>
       <Header title="Profile" />
       <View style={styles.content}>
         {isAuthenticated ? (
           <View style={styles.authenticatedContent}>
-            {/* User Profile Card */}
-            <View style={styles.profileCard}>
-              <View style={styles.avatarPlaceholder}>
-                <Typography variant="h1" color="#FFFFFF" weight="bold">
-                  {phoneNumber ? phoneNumber.slice(-1) : 'U'}
+            <Card style={styles.profileHeroCard}>
+              <View style={styles.avatarWrap}>
+                <Image source={{ uri: PROFILE_IMAGE_URI }} style={styles.avatarImage} contentFit="cover" />
+
+                <View style={styles.memberBadgeDot}>
+                  <MaterialIcons name="verified" size={12} color="#FFFFFF" />
+                </View>
+              </View>
+
+              <Typography variant="h3" color={theme.colors.textPrimary} align="center" style={styles.userName}>
+                {profileName}
+              </Typography>
+
+              <View style={styles.memberPill}>
+                <MaterialIcons name="workspace-premium" size={14} color="#8B5E00" />
+                <Typography variant="caption" weight="bold" color="#8B5E00" style={styles.memberPillText}>
+                  {memberLabel}
                 </Typography>
               </View>
-              <Typography variant="h3" color={theme.colors.textPrimary} style={styles.userName}>
-                Ustaad Customer
-              </Typography>
-              <Typography variant="body" color={theme.colors.textSecondary}>
-                {phoneNumber ? `+${phoneNumber}` : 'Guest User'}
-              </Typography>
-            </View>
-            {/* Edit Profile Button */}
-            <Button
-              title="Edit Profile"
-              variant="primary"
-              onPress={() => router.push('/profile/edit')}
-              style={styles.editProfileButton}
-            />
+            </Card>
 
-            {/* Settings Sections */}
-            <View style={styles.sectionsContainer}>
-              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/addresses')} activeOpacity={0.8}>
-                <MaterialIcons name="location-on" size={24} color={theme.colors.textSecondary} />
-                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>Saved Addresses</Typography>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/payments')} activeOpacity={0.8}>
-                <MaterialIcons name="payment" size={24} color={theme.colors.textSecondary} />
-                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>Payment Methods</Typography>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/language')} activeOpacity={0.8}>
-                <MaterialIcons name="language" size={24} color={theme.colors.textSecondary} />
-                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>App Language</Typography>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.sectionRow} onPress={() => router.push('/profile/settings')} activeOpacity={0.8}>
-                <MaterialIcons name="settings" size={24} color={theme.colors.textSecondary} />
-                <Typography variant="body" color={theme.colors.textPrimary} style={styles.sectionLabel}>App Settings</Typography>
-              </TouchableOpacity>
+            <View style={styles.sectionGroup}>
+              <Typography variant="h3" weight="bold" style={styles.sectionHeading}>
+                Account Settings
+              </Typography>
+
+              <View style={styles.menuStack}>
+                <Card style={styles.infoCard}>
+                  <View style={styles.sectionLabelRow}>
+                    <MaterialIcons name="person-outline" size={22} color="#9A6A10" />
+                    <Typography variant="body" weight="bold" style={styles.sectionLabel}>
+                      PERSONAL INFORMATION
+                    </Typography>
+                  </View>
+
+                  <InfoRow label="Full Name" value={profileName} />
+                  <InfoRow label="Email" value={profileEmail} />
+                  <InfoRow label="Phone" value={profilePhone} />
+                </Card>
+
+                <Card style={styles.addressCard}>
+                  <View style={styles.sectionLabelRow}>
+                    <MaterialIcons name="location-on" size={22} color="#9A6A10" />
+                    <Typography variant="body" weight="bold" style={styles.sectionLabel}>
+                      PRIMARY ADDRESS
+                    </Typography>
+                  </View>
+
+                  <Typography variant="h3" color={theme.colors.textPrimary} style={styles.addressValue}>
+                    {profileAddress}
+                  </Typography>
+                </Card>
+
+                <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/profile/edit')} activeOpacity={0.86}>
+                  <View style={styles.actionLeft}>
+                    <MaterialIcons name="edit" size={22} color="#9A6A10" />
+                    <Typography variant="body" weight="bold" color={theme.colors.textPrimary} style={styles.actionTitle}>
+                      Edit Profile
+                    </Typography>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={28} color="#8B6A45" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionCard} onPress={() => router.push('/profile/settings')} activeOpacity={0.86}>
+                  <View style={styles.actionLeft}>
+                    <MaterialIcons name="lock-outline" size={22} color="#9A6A10" />
+                    <Typography variant="body" weight="bold" color={theme.colors.textPrimary} style={styles.actionTitle}>
+                      Change Password
+                    </Typography>
+                  </View>
+                  <MaterialIcons name="chevron-right" size={28} color="#8B6A45" />
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <Button
-              title="Logout"
-              variant="outline"
-              textColor={theme.colors.error}
-              onPress={handleLogoutPress}
-              style={styles.logoutButton}
-              icon="LogOut"
-            />
+            <View style={styles.sectionGroup}>
+              <Typography variant="h3" weight="bold" style={styles.sectionHeading}>
+                Support
+              </Typography>
+
+              <View style={styles.supportCard}>
+                <SupportRow
+                  icon="help-outline"
+                  title="Help Center"
+                  onPress={() => router.push('/more/faqs')}
+                />
+                <View style={styles.supportDivider} />
+                <SupportRow
+                  icon="policy"
+                  title="Privacy Policy"
+                  onPress={() => router.push('/more/terms-privacy')}
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.logoutPill} onPress={handleLogoutPress} activeOpacity={0.86}>
+              <MaterialIcons name="logout" size={20} color="#B91C1C" />
+              <Typography variant="body" weight="bold" color="#B91C1C" style={styles.logoutText}>
+                Logout
+              </Typography>
+            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.unauthenticatedContent}>
@@ -103,15 +177,14 @@ export default function ProfileScreen() {
               align="center"
               style={styles.messageBody}
             >
-              Please log in to manage your personal details, home addresses, payment options, and language settings.
+              Please log in to manage your personal details, address, and support preferences.
             </Typography>
-            <Button
-              title="Sign In"
-              variant="primary"
-              onPress={handleLoginPress}
-              style={styles.loginButton}
-              icon="LogIn"
-            />
+            <TouchableOpacity style={styles.loginButton} onPress={handleLoginPress} activeOpacity={0.86}>
+              <MaterialIcons name="login" size={20} color="#FFFFFF" />
+              <Typography variant="body" weight="bold" color="#FFFFFF" style={styles.loginButtonText}>
+                Sign In
+              </Typography>
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -125,71 +198,184 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   content: {
-    flex: 1,
-    paddingVertical: theme.spacing.xl,
-  },
-  authenticatedContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: theme.spacing.lg,
   },
-  profileCard: {
-    width: '100%',
-    backgroundColor: theme.colors.card,
-    borderRadius: 16,
-    padding: theme.spacing.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-    marginTop: theme.spacing.md,
+  pageContent: {
+    flexGrow: 1,
   },
-  avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: theme.colors.primary,
+  authenticatedContent: {
+    gap: theme.spacing.lg,
+  },
+  profileHeroCard: {
+    width: '100%',
+    alignItems: 'center',
+    paddingTop: 34,
+    paddingBottom: 28,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: '#DDE7F1',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+  avatarWrap: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  avatarImage: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    backgroundColor: '#E5E7EB',
+    borderWidth: 5,
+    borderColor: '#F59E0B',
+  },
+  memberBadgeDot: {
+    position: 'absolute',
+    right: -2,
+    bottom: 4,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#A36B00',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.md,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   userName: {
     fontFamily: theme.typography.fontFamilies.bold,
-    marginBottom: theme.spacing.xs,
+    marginBottom: 12,
+    fontSize: 24,
   },
-  sectionsContainer: {
-    width: '100%',
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
-  },
-  sectionRow: {
+  memberPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    gap: 6,
+    backgroundColor: '#F6DAB4',
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  memberPillText: {
+    fontSize: 13,
+  },
+  sectionGroup: {
+    gap: 14,
+  },
+  sectionHeading: {
+    color: '#5B4636',
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  menuStack: {
+    width: '100%',
+    gap: 16,
+  },
+  infoCard: {
+    gap: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    backgroundColor: '#FFFFFF',
+  },
+  sectionLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 4,
   },
   sectionLabel: {
-    marginLeft: theme.spacing.sm,
-    fontFamily: theme.typography.fontFamilies.medium,
-    color: theme.colors.textPrimary,
+    color: '#9A6A10',
+    letterSpacing: 0.6,
+    fontSize: 14,
   },
-  logoutButton: {
-    width: '100%',
-    height: 52,
-    borderRadius: theme.borderRadius.full,
+  infoRow: {
+    gap: 4,
+  },
+  infoLabel: {
+    color: '#6B7280',
+    fontSize: 13,
+  },
+  infoValue: {
+    color: '#1F1F1F',
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  addressCard: {
+    gap: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    backgroundColor: '#FFFFFF',
+  },
+  addressValue: {
+    fontSize: 18,
+    lineHeight: 26,
+  },
+  actionCard: {
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: theme.colors.error,
+    borderColor: '#E2E8F0',
+    backgroundColor: theme.colors.card,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  editProfileButton: {
+  actionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    flex: 1,
+  },
+  actionTitle: {
+    fontSize: 17,
+  },
+  supportCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    backgroundColor: theme.colors.card,
+    overflow: 'hidden',
+  },
+  supportRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  supportLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  supportTitle: {
+    color: '#1F1F1F',
+    fontSize: 14,
+  },
+  supportDivider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginLeft: 16,
+  },
+  logoutPill: {
     width: '100%',
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
+    minHeight: 66,
+    borderRadius: 18,
+    backgroundColor: '#FBD7D3',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  logoutText: {
+    fontSize: 16,
   },
   unauthenticatedContent: {
     flex: 1,
@@ -209,5 +395,48 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 52,
     borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  loginButtonText: {
+    fontSize: 15,
   },
 });
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.infoRow}>
+      <Typography variant="caption" style={styles.infoLabel}>
+        {label}
+      </Typography>
+      <Typography variant="body" style={styles.infoValue}>
+        {value}
+      </Typography>
+    </View>
+  );
+}
+
+function SupportRow({
+  icon,
+  title,
+  onPress,
+}: {
+  icon: keyof typeof MaterialIcons.glyphMap;
+  title: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity style={styles.supportRow} onPress={onPress} activeOpacity={0.85}>
+      <View style={styles.supportLeft}>
+        <MaterialIcons name={icon} size={22} color="#5E5E5E" />
+        <Typography variant="body" style={styles.supportTitle}>
+          {title}
+        </Typography>
+      </View>
+      <MaterialIcons name="open-in-new" size={18} color="#8B6A45" />
+    </TouchableOpacity>
+  );
+}
